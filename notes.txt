@@ -1,0 +1,20 @@
+# step 1: adjust the background image to 1920X1080
+ffmpeg -y -i bg_eth.jpg -vf scale=1920:1080 bg_out.jpg
+
+# step 1.1: overlay the top-left zhiying logo
+ffmpeg -i video.mp4 -i green-bg.jpg -filter_complex "[1:v]scale=300:300[v1],[0:v][v1]overlay=0:0[out]" -map "[out]" -map 0:a:0 -c:a copy out_test.mp4
+
+# step 2: Add background
+ffmpeg -y -i bg_out.jpg -i video.mp4 -filter_complex '[1:v]colorkey=0x00ff00:0.2:0.3[ckout];[0:v][ckout]overlay[out]' -map '[out]' -map 1:a:0 -acodec copy out.mp4
+ffmpeg -y -i video2.mp4 -i bg03.png -filter_complex '[0:v]colorkey=0x00ff00:0.2:0.3[ckout];[1:v]scale=1920:1080[bg],[bg][ckout]overlay[out]' -map '[out]' -map 0:a:0 -c:a copy out_tmp.mp4
+
+# Step 3: Add title
+ffmpeg -y -i out.mp4 -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='以太坊禁止显卡挖矿引连锁反应：二手市场流入大量矿卡':fontcolor=yellow:fontsize=50:box=1:boxcolor=black@0.1:boxborderw=5:x=(w-text_w)/2:y=50" -codec:a copy -y out_t.mp4
+
+3 Step 4: Add logo
+ffmpeg -y -i out_t.mp4 -i cnBeta.png -filter_complex "[1:v]colorkey=0xffffff:0.3:0.2[ckout];[0:v][ckout]overlay=50:80[out]" -map '[out]' -map 0:a:0 -c:a copy out_tl.mp4
+
+
+# split video into N parts:
+# https://unix.stackexchange.com/questions/148602/ffmpeg-split-video-multiple-parts
+ffmpeg -i fff.avi -acodec copy -f segment -segment_time 10 -vcodec copy -reset_timestamps 1 -map 0 fff%d.avi

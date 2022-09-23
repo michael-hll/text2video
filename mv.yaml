@@ -1,0 +1,55 @@
+Variables:
+    text2video_root: /volumes/macdrive/projects/text2video
+    downloads: /Users/lianglianghan/downloads
+    output_final_draft: 'video_final_draft.mp4'
+    output_final_draft_t: 'video_final_draft_t.mp4'
+    output_final_draft_tl: 'video_final_draft_tl.mp4'
+    output_final: 'video_final.mp4'
+    title: '2022Q2全球智能手机AP市场：联发科销量份额第一 华为海思仅剩0.4%'
+    lb: '{'
+    rb: '}'
+Tube:
+    # step 1: Get 'video_init.mp4'
+    - PATH: {downloads}
+    - COMMAND: rm 未命名*.mp4 --continue
+    - PATH: {text2video_root}
+    - COMMAND: python3 t2v.py ./article.yaml
+    # Wating the video download to be finished
+    - PAUSE: 0.3 
+    - PATH: {downloads}
+    - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{lb}print "vname="$NF{rb}' > video_init_name.txt
+    - GET_FILE_KEY_VALUE: -f video_init_name.txt
+    - PRINT_VARS: '*'
+    - PATH: {text2video_root}
+    - COMMAND: mkdir -p ./tmp
+    - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4 
+
+    # # step 2: Split init video into pieces
+    # # currently it seems limition be default it could split them into 10 seconds
+    # # less than 10 seconds video doesn't work
+    - PATH: '{text2video_root}/tmp'
+    - COMMAND: rm -f video_init_*.mp4
+    - COMMAND: rm -f video_final_*.mp4
+    - COMMAND: ffmpeg -y -i video_init.mp4 -acodec copy -f segment -segment_time 10 -vcodec copy -reset_timestamps 1 -map 0 video_init_%2d.mp4
+
+    # # step 3: Add background for each splited videos
+    # # and output combined video: video_final_draft.mp4
+    - PATH: {text2video_root}
+    - COMMAND: python3 pv.py ./tmp
+
+    # # step 4: Add title
+    - PATH: '{text2video_root}/tmp'
+    - COMMAND: ffmpeg -y -i {output_final_draft} -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{title}':fontcolor=yellow:fontsize=60:box=1:boxcolor=black@0.1:boxborderw=5:x=(w-text_w)/2:y=20:expansion=none" -codec:a copy -y {output_final_draft_t}
+    
+    # # Step 5: Add logo
+    - PATH: '{text2video_root}/tmp'
+    - COMMAND: ffmpeg -y -i {output_final_draft_t} -i cnBeta.png -filter_complex "[1:v]colorkey=0xffffff:0.3:0.2[ckout];[0:v][ckout]overlay=50:80[out]" -map "[out]" -map 0:a:0 -c:a copy {output_final_draft_tl}
+
+    # # Step 6: Genearte the final one
+    - PATH: '{text2video_root}/tmp'
+    - COMMAND: cp -f {output_final_draft_tl} {output_final}
+    - COMMAND: rm -f video_init*.mp4
+    - COMMAND: rm -f video_final_*.mp4
+    - COMMAND: rm filelist.txt
+    - COMMAND: ffplay {output_final}
+
