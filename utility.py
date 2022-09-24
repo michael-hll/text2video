@@ -14,3 +14,8 @@ class Utility:
         if key in data.keys():
             return data[key]
         return None
+    
+    @staticmethod
+    def write_line_to_file(file, how='a', line=''):
+        with open(file, how) as f:
+            f.write(line + '\n')

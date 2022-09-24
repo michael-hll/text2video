@@ -12,10 +12,27 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 from utility import Utility
 import time
+import random
 
-article_file = './text2video/article.yaml'
+article_file = './article.yaml'
 if len(sys.argv) >= 2:
     article_file = sys.argv[1]
+
+reporters = {
+    0: {'name': '慕瑶', 'sex': 'W'},
+    1: {'name': '卓妤', 'sex': 'W'},
+    2: {'name': '夏青', 'sex': 'W'},
+    3: {'name': '蓓瑾', 'sex': 'W'},
+    4: {'name': '依丹', 'sex': 'W'},
+    5: {'name': '静芙', 'sex': 'W'},
+    6: {'name': '梦瑶', 'sex': 'W'},
+    7: {'name': '云燕', 'sex': 'W'},
+    8: {'name': '廷新', 'sex': 'M'},
+    9: {'name': '明泽', 'sex': 'M'},
+    10: {'name': '晋龙', 'sex': 'M'},
+    11: {'name': '寒云', 'sex': 'M'},
+             }    
+suggest_reporters = [0,1,2,4,5,7,9]
 
 def exe_command(command):
     command_array = shlex.split(command, posix=True)
@@ -55,15 +72,13 @@ def get_init_video(article):
             By.XPATH, "//img[contains(@src,'nav_virtual.svg')]")
         img.click()
 
-        # 慕瑶数字人
-        # https://ai.sogoucdn.com/observer/48e6f99ad8dbc996b7db8c4a5a96c466.png
-        # img = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH,"//img[contains(@src,'48e6f99ad8dbc996b7db8c4a5a96c466.png')]")))
-        img = driver.find_element(
-            By.XPATH, "//img[contains(@src,'48e6f99ad8dbc996b7db8c4a5a96c466.png')]")
-        img.click()
+        # 随机选择数字人
+        # 查看更多数字人
+        div = driver.find_element(
+            By.XPATH, "//div[contains(@class,'star__more__box___1OtN9')]")
+        div.click()
 
         # 文本驱动对话框
-        iframe: WebElement
         # 切换到iframe对话框
         WebDriverWait(driver, 10).until(
             EC.frame_to_be_available_and_switch_to_it((By.ID, "ShengkaIframe")))
@@ -83,62 +98,91 @@ def get_init_video(article):
         core_div = driver.find_element(
             By.XPATH, "//div[contains(@class, 'simplebar-content')]")
         buttons = core_div.find_elements(By.TAG_NAME, "button")
-        print(div)
-        print(buttons)
-        btnDigitalManSetting = None
         btnGenDraftView = None
         for button in buttons:
             if "画面设置" in button.text:
                 btnDigitalManSetting = button
             if "生成预览" in button.text:
                 btnGenDraftView = button
-
-        # 打开数字人设置
-        # 画面， 背景
-        if btnDigitalManSetting:
             
-            # 点击数字人设置按钮
-            btnDigitalManSetting.click()
-            time.sleep(1)
-
-            # 获取弹出对话框的主要div
-            divModel = driver.find_element(
-                By.XPATH, "//div[contains(@class, 'ant-modal-body')]") \
-                    .find_element(By.TAG_NAME, 'div')
-            # 拿到画面设置div
-            divs = divModel.find_elements(By.TAG_NAME, "div")
-            divHeader = divs[0]
-            #divBody = divs[1]
-            #divFooter = divs[2]
-            divHeader.find_elements(By.TAG_NAME, "div")[1].click()
-            time.sleep(2)
+        # 随机选择一个数字播报员
+        select_reporter_index = random.choice(suggest_reporters)   
+        line = 'reporter_name={0}'.format(reporters[select_reporter_index]['name']) 
+        Utility.write_line_to_file('./reporter.txt', 'w', line)
+        #   _1JxXrgZAWgtvq6gz6q99v3            
+        divs = driver.find_elements(By.XPATH, "//div[contains(@class, '_1JxXrgZAWgtvq6gz6q99v3')]")
+        divs[select_reporter_index].click()
+        time.sleep(2)     
+        
+        # 随机选择一套服装
+        #_3LOqC5HR4bvrFTOvsjRykj
+        # 点击服装Tab
+        divs = driver.find_elements(By.XPATH, "//div[contains(@class, '_3LOqC5HR4bvrFTOvsjRykj')]")
+        for div in divs:
+            if div.text == "服装":
+                div.click()
+                time.sleep(2)    
+                break    
             
-            divModel = driver.find_element(
-                By.XPATH, "//div[contains(@class, 'ant-modal-body')]") \
-                    .find_element(By.TAG_NAME, 'div')
-            
-            # 自定义按钮
-            # _15FKSds2ykmxEZUXdbNY7p
-            div = divModel.find_element(By.XPATH, "//div[contains(@class, '_15FKSds2ykmxEZUXdbNY7p')]")
-            div.find_elements(By.TAG_NAME, "div")[1].click()
-            
-            # slice-row-content
-            # 设置自定义背景为绿色
-            time.sleep(2)
-            div = divModel.find_element(By.XPATH, "//div[contains(@class, 'slice-row-content')]") \
-                .find_element(By.TAG_NAME, "div")
-            divs = div.find_elements(By.TAG_NAME, "div")
-            divs[1].click()
-            time.sleep(2)
-            
-            # ant-btn ant-btn-primary
-            # 点击完成按钮
-            buttons = driver.find_elements(
-                By.XPATH, "//button[contains(@class, 'ant-btn ant-btn-primary')]")
-            for button in buttons:
-                if button.text == "完成":
-                    button.click()
-                    time.sleep(2)
+        # 选择衣服和颜色
+        #   _1JxXrgZAWgtvq6gz6q99v3            
+        divs = driver.find_elements(By.XPATH, "//div[contains(@class, '_1JxXrgZAWgtvq6gz6q99v3')]")
+        total = len(divs)
+        clothes = 0
+        for div in divs:
+            # find its parent div
+            parent = div.find_element(By.XPATH, '..')
+            child_divs = parent.find_elements(By.XPATH, './div')
+            clothes = len(child_divs)
+            break
+        
+        cloth_index = random.randrange(0, clothes)
+        color_index = random.randrange(clothes, total)
+        # 选择衣服
+        divs[cloth_index].click()
+        time.sleep(2)
+        divs = driver.find_elements(By.XPATH, "//div[contains(@class, '_1JxXrgZAWgtvq6gz6q99v3')]")
+        # 选择颜色
+        divs[color_index].click()
+        time.sleep(2)
+        
+        # 获取弹出对话框的主要div
+        divModel = driver.find_element(
+            By.XPATH, "//div[contains(@class, 'ant-modal-body')]") \
+                .find_element(By.TAG_NAME, 'div')
+                
+        # 拿到画面设置div
+        divs = divModel.find_elements(By.TAG_NAME, "div")
+        divHeader = divs[0]
+        divHeader.find_elements(By.TAG_NAME, "div")[1].click()
+        time.sleep(2)
+        
+        divModel = driver.find_element(
+            By.XPATH, "//div[contains(@class, 'ant-modal-body')]") \
+                .find_element(By.TAG_NAME, 'div')
+        
+        # 自定义按钮
+        # _15FKSds2ykmxEZUXdbNY7p
+        div = divModel.find_element(By.XPATH, "//div[contains(@class, '_15FKSds2ykmxEZUXdbNY7p')]")
+        div.find_elements(By.TAG_NAME, "div")[1].click()
+        
+        # slice-row-content
+        # 设置自定义背景为绿色
+        time.sleep(2)
+        div = divModel.find_element(By.XPATH, "//div[contains(@class, 'slice-row-content')]") \
+            .find_element(By.TAG_NAME, "div")
+        divs = div.find_elements(By.TAG_NAME, "div")
+        divs[1].click()
+        time.sleep(2)
+        
+        # ant-btn ant-btn-primary
+        # 点击完成按钮
+        buttons = driver.find_elements(
+            By.XPATH, "//button[contains(@class, 'ant-btn ant-btn-primary')]")
+        for button in buttons:
+            if button.text == "完成":
+                button.click()
+                time.sleep(2)
         
         # 输入文本
         div = driver.find_element(By.XPATH, "//div[contains(@contenteditable, 'true')]")
