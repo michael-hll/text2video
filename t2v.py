@@ -33,6 +33,7 @@ reporters = {
     11: {'name': '寒云', 'sex': 'M'},
              }    
 suggest_reporters = [0,1,2,4,5,7,9]
+selected_reporter = '慕瑶'
 
 def exe_command(command):
     command_array = shlex.split(command, posix=True)
@@ -107,8 +108,9 @@ def get_init_video(article):
             
         # 随机选择一个数字播报员
         select_reporter_index = random.choice(suggest_reporters)   
-        line = 'reporter_name={0}'.format(reporters[select_reporter_index]['name']) 
-        Utility.write_line_to_file('./reporter.txt', 'w', line)
+        selected_reporter = reporters[select_reporter_index]['name']
+        #line = 'reporter_name={0}'.format(reporters[select_reporter_index]['name']) 
+        #Utility.write_line_to_file('./reporter.txt', 'w', line)
         #   _1JxXrgZAWgtvq6gz6q99v3            
         divs = driver.find_elements(By.XPATH, "//div[contains(@class, '_1JxXrgZAWgtvq6gz6q99v3')]")
         divs[select_reporter_index].click()
@@ -187,7 +189,9 @@ def get_init_video(article):
         # 输入文本
         div = driver.find_element(By.XPATH, "//div[contains(@contenteditable, 'true')]")
         p = div.find_element(By.TAG_NAME, "p")
-        script_text = article['hello'] + article['content'] + article['ending']
+        script_text = article['hello'].format(selected_reporter) + \
+            article['content'] + \
+            article['ending'].format(selected_reporter)
         driver.execute_script("arguments[0].textContent = arguments[1];", p, script_text)
         
         # 显示字幕按钮
