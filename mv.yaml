@@ -18,20 +18,26 @@ Tube:
     - PAUSE: 0.3 
     - PATH: {downloads}
     - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{lb}print "vname="$NF{rb}' > video_init_name.txt
+    - PAUSE: 0.05
     - GET_FILE_KEY_VALUE: -f video_init_name.txt
     - PRINT_VARS: '*'
     - PATH: {text2video_root}
     - COMMAND: mkdir -p ./tmp
-    - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4 
+    - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4  
+    # remove backgound pictures  
+    - PATH: '{text2video_root}/tmp'
+    - COMMAND: rm bg*.jpg --continue
+    - PATH: {text2video_root}
     # get background pictures
     - COMMAND: python3 downpics.py ./apikeys.yaml '{keywords}' 20 ./tmp
+    
 
     # # step 2: Split init video into pieces
     # # currently it seems limition be default it could split them into 10 seconds
     # # less than 10 seconds video doesn't work
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: rm -f video_init_*.mp4
-    - COMMAND: rm -f video_final_*.mp4
+    - COMMAND: rm -f video_init_*.mp4 --continue
+    - COMMAND: rm -f video_final_*.mp4 --continue
     - COMMAND: ffmpeg -y -i video_init.mp4 -acodec copy -f segment -segment_time 10 -vcodec copy -reset_timestamps 1 -map 0 video_init_%2d.mp4
 
     # # step 3: Add background for each splited videos
@@ -50,9 +56,8 @@ Tube:
     # # Step 6: Genearte the final one
     - PATH: '{text2video_root}/tmp'
     - COMMAND: cp -f {output_final_draft_tl} {output_final}
-    - COMMAND: rm -f video_init*.mp4
-    - COMMAND: rm -f video_final_*.mp4
-    - COMMAND: rm filelist.txt
-    - COMMAND: rm bg*.jpg
+    - COMMAND: rm -f video_init_*.mp4 --continue
+    - COMMAND: rm -f video_final_*.mp4 --continue
+    - COMMAND: rm filelist.txt --continue
     - COMMAND: ffplay {output_final}
 
