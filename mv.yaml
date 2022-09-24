@@ -5,7 +5,6 @@ Variables:
     output_final_draft_t: 'video_final_draft_t.mp4'
     output_final_draft_tl: 'video_final_draft_tl.mp4'
     output_final: 'video_final.mp4'
-    title: '2022Q2全球智能手机AP市场：联发科销量份额第一 华为海思仅剩0.4%'
     lb: '{'
     rb: '}'
 Tube:
@@ -14,6 +13,7 @@ Tube:
     - COMMAND: rm 未命名*.mp4 --continue
     - PATH: {text2video_root}
     - COMMAND: python3 t2v.py ./article.yaml
+    - GET_FILE_KEY_VALUE: -f ./article.yaml -k title,keywords --override
     # Wating the video download to be finished
     - PAUSE: 0.3 
     - PATH: {downloads}
@@ -23,6 +23,8 @@ Tube:
     - PATH: {text2video_root}
     - COMMAND: mkdir -p ./tmp
     - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4 
+    # get background pictures
+    - COMMAND: python3 downpics.py ./apikeys.yaml '{keywords}' 20 ./tmp
 
     # # step 2: Split init video into pieces
     # # currently it seems limition be default it could split them into 10 seconds
@@ -51,5 +53,6 @@ Tube:
     - COMMAND: rm -f video_init*.mp4
     - COMMAND: rm -f video_final_*.mp4
     - COMMAND: rm filelist.txt
+    - COMMAND: rm bg*.jpg
     - COMMAND: ffplay {output_final}
 

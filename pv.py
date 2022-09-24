@@ -39,7 +39,7 @@ with open(file_list, 'w') as f:
     for i in range(0, count):        
         video_name = video_prefix + digit_format.format(i) + '.mp4'
         video_output = video_prefix + digit_format.format(i) + '_b.mp4'
-        img_name = img_prefix.format(i) + '.png'    
+        img_name = img_prefix.format(i) + '.jpg'    
         ffmpeg_cmd = "ffmpeg -y -i {0} -i {1} -filter_complex '[0:v]colorkey=0x00ff00:0.2:0.3[ckout];[1:v]scale=1920:1080[bg],[bg][ckout]overlay[out]' -map '[out]' -map 0:a:0 -c:a copy {2}"
         ffmpeg_cmd = ffmpeg_cmd.format(video_name, img_name, video_output)
         result = exe_command(ffmpeg_cmd)
