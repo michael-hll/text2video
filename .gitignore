@@ -5,3 +5,7 @@ mv.yaml.log
 tube
 tube.log
 .DS_Store
+apikeys.yaml
+test.yaml
+test.yaml.log
+__pycache__

@@ -10,16 +10,12 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
+from utility import Utility
 import time
 
 article_file = './text2video/article.yaml'
 if len(sys.argv) >= 2:
     article_file = sys.argv[1]
-
-def read_yaml_content(file):
-    with open(file, 'r') as f:
-        data = yaml.safe_load(f)
-        return data
 
 def exe_command(command):
     command_array = shlex.split(command, posix=True)
@@ -216,7 +212,7 @@ def get_init_video(article):
         print('=== Exception: ' + str(e))
 
 # reading inputs    
-article = read_yaml_content(article_file)
+article = Utility.read_yaml_content(article_file)
 
 # get the init video
 get_init_video(article)
