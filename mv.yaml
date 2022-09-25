@@ -5,8 +5,10 @@ Variables:
     output_final_draft_t: 'video_final_draft_t.mp4'
     output_final_draft_tl: 'video_final_draft_tl.mp4'
     output_final: 'video_final.mp4'
+    output_final_prefix: 'video_final_'
     lb: '{'
     rb: '}'
+    media_type: 科技
 Tube:
     # step 1: Get 'video_init.mp4'
     - PATH: {downloads}
@@ -38,7 +40,9 @@ Tube:
     - PATH: '{text2video_root}/tmp'
     - COMMAND: rm -f video_init_*.mp4 --continue
     - COMMAND: rm -f video_final_*.mp4 --continue
-    - COMMAND: ffmpeg -y -i video_init.mp4 -acodec copy -f segment -segment_time 10 -vcodec copy -reset_timestamps 1 -map 0 video_init_%2d.mp4
+    - COMMAND: >
+        ffmpeg -y -i video_init.mp4 -acodec copy -f segment -segment_time 10 
+        -vcodec copy -reset_timestamps 1 -map 0 video_init_%2d.mp4
 
     # # step 3: Add background for each splited videos
     # # and output combined video: video_final_draft.mp4
@@ -47,15 +51,40 @@ Tube:
 
     # # step 4: Add title
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: ffmpeg -y -i {output_final_draft} -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{title}':fontcolor=yellow:fontsize=60:box=1:boxcolor=black@0.1:boxborderw=5:x=(w-text_w)/2:y=20:expansion=none" -codec:a copy -y {output_final_draft_t}
+    - COMMAND: >
+        ffmpeg -y -i {output_final_draft} 
+        -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{title}':fontcolor=yellow:fontsize=60:
+        box=1:boxcolor=black@0.1:boxborderw=5:x=(w-text_w)/2:y=20:expansion=none"
+        -codec:a copy -y {output_final_draft_t}
     
     # # Step 5: Add logo
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: ffmpeg -y -i {output_final_draft_t} -i cnBeta.png -filter_complex "[1:v]colorkey=0xffffff:0.3:0.2[ckout];[0:v][ckout]overlay=50:80[out]" -map "[out]" -map 0:a:0 -c:a copy {output_final_draft_tl}
+    - COMMAND: >
+        ffmpeg -y -i {output_final_draft_t} -i cnBeta.png 
+        -filter_complex "[1:v]colorkey=0xffffff:0.3:0.2[ckout];[0:v][ckout]overlay=50:80[out]" 
+        -map "[out]" -map 0:a:0 -c:a copy {output_final_draft_tl}
+    
+    # 科技logo
+    - COMMAND: >
+        ffmpeg -y -i {output_final_draft_tl} -i logo-tec.jpg
+        -filter_complex 
+            "[1:v]colorkey=0x00ff00:0.3:0.2[ckout];
+            [0:v][ckout]overlay=x=-50:y=980[out]" 
+        -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}media_type.mp4
+        --if {media_type}==科技
+    
+    # 娱乐logo
+    - COMMAND: >
+        ffmpeg -y -i {output_final_draft_tl} -i logo-tec.jpg
+        -filter_complex 
+            "[1:v]colorkey=0x00ff00:0.3:0.2[ckout];
+            [0:v][ckout]overlay=x=-50:y=980[out]" 
+        -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}media_type.mp4
+        --if {media_type}==娱乐
 
     # # Step 6: Genearte the final one
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: cp -f {output_final_draft_tl} {output_final}
+    - COMMAND: cp -f {output_final_prefix}media_type.mp4 {output_final}
     - COMMAND: rm -f video_init_*.mp4 --continue
     - COMMAND: rm -f video_final_*.mp4 --continue
     - COMMAND: rm filelist.txt --continue
