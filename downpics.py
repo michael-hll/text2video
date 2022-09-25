@@ -1,6 +1,7 @@
 from pypexels import PyPexels
 from utility import Utility
 import requests, sys, os
+import shutil
 
 def __pexels_api_description():
     #GET https://api.pexels.com/v1/search
@@ -59,7 +60,7 @@ if len(sys.argv) >=6:
 py_pexel = PyPexels(api_key=Utility.get_api_key(key_file, 'PEXELS_API_KEY'))
 search_pics_response = py_pexel.search(query=keywords, orientation='landscape', per_page=count)
 
-# iterate response photos
+# download photos by keywords
 i = 0
 for pic in search_pics_response.body['photos']:    
     url = pic['src']['original']
@@ -68,8 +69,24 @@ for pic in search_pics_response.body['photos']:
     if width < height:
         continue
     print('Downloading: {0}'.format(url))
-    r = requests.get(url)
-    with open(os.path.join(out_dir, pic_name.format(i)), 'wb') as f:
-        f.write(r.content)
-        i += 1
+    try:
+        r = requests.get(url)
+        with open(os.path.join(out_dir, pic_name.format(i)), 'wb') as f:
+            f.write(r.content)
+            i += 1
+    except Exception as e:
+        print('Download picture fail:' + str(e))
+        
+# check default photos     
+default_dir = out_dir + '/default-bg'
+i = 0
+for filename in os.listdir(default_dir):
+    f = os.path.join(default_dir, filename)    
+    # replace the original background
+    target_f = os.path.join(out_dir + '/' + pic_name.format(i))
+    i += 1
+    if(os.path.exists(target_f)):
+        os.remove(target_f)
+    shutil.move(f, target_f)
+ 
   
