@@ -114,7 +114,7 @@ def get_init_video(article):
         #   _1JxXrgZAWgtvq6gz6q99v3            
         divs = driver.find_elements(By.XPATH, "//div[contains(@class, '_1JxXrgZAWgtvq6gz6q99v3')]")
         divs[select_reporter_index].click()
-        time.sleep(2)     
+        time.sleep(3)     
         
         # 随机选择一套服装
         #_3LOqC5HR4bvrFTOvsjRykj
