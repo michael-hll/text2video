@@ -10,3 +10,4 @@ test.yaml
 test.yaml.log
 __pycache__
 reporter.txt
+test.py
