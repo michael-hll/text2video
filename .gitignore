@@ -11,3 +11,4 @@ test.yaml.log
 __pycache__
 reporter.txt
 test.py
+weathers.txt
