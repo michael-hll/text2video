@@ -7,8 +7,8 @@ Variables:
     output_final: 'video_final.mp4'
     output_final_prefix: 'video_final_'
     media_type: 科技
-    t2v: yes # If re-generate the 'video_init.mp4'
     SPACE: '      '
+    t2v: yes # If re-generate the 'video_init.mp4'    
 Tube:
     # step 1: Get 'video_init.mp4'
     - PATH: {downloads}
@@ -53,7 +53,7 @@ Tube:
     - COMMAND: >
         ffmpeg -y -i {output_final_draft} 
         -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{title}':
-        fontcolor=yellow:fontsize=120:enable='between(t,0,5)':
+        fontcolor=yellow:fontsize=125:enable='between(t,0,5)':
         box=1:boxcolor=black@0.6:boxborderw=5:x=(w-text_w)/2:y=(h/2):expansion=none"
         -codec:a copy -y {output_final_prefix}t1.mp4
     - COMMAND: >
@@ -86,23 +86,13 @@ Tube:
         -filter_complex "[1:v]colorkey=0xffffff:0.3:0.2[ckout];[0:v][ckout]overlay=50:80[out]" 
         -map "[out]" -map 0:a:0 -c:a copy {output_final_draft_tl}
     
-    # 科技logo
+    # logo
     - COMMAND: >
-        ffmpeg -y -i {output_final_draft_tl} -i logo-tec.jpg
+        ffmpeg -y -i {output_final_draft_tl} -i Rnews.jpg
         -filter_complex 
             "[1:v]colorkey=0x00ff00:0.3:0.2[ckout];
             [0:v][ckout]overlay=x=-50:y=980[out]" 
         -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}media_type.mp4
-        --if {media_type}==科技
-    
-    # 娱乐logo
-    - COMMAND: >
-        ffmpeg -y -i {output_final_draft_tl} -i logo-tec.jpg
-        -filter_complex 
-            "[1:v]colorkey=0x00ff00:0.3:0.2[ckout];
-            [0:v][ckout]overlay=x=-50:y=980[out]" 
-        -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}media_type.mp4
-        --if {media_type}==娱乐
 
     # # Step 6: Genearte the final one
     - PATH: '{text2video_root}/tmp'
@@ -111,4 +101,3 @@ Tube:
     - COMMAND: rm -f video_final_*.mp4 --continue
     - COMMAND: rm filelist.txt --continue
     - COMMAND: ffplay {output_final}
-
