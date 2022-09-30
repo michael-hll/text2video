@@ -22,7 +22,6 @@ Tube:
     - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{LCB}print "vname="$NF{RCB}' > video_init_name.txt --if {t2v}
     - PAUSE: 0.05
     - GET_FILE_KEY_VALUE: -f video_init_name.txt
-    - PRINT_VARS: '*'
     - PATH: {text2video_root}
     - COMMAND: mkdir -p ./tmp
     - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4  --if {t2v}
@@ -31,6 +30,7 @@ Tube:
     - COMMAND: rm bg*.jpg --continue --if {t2v}
     - PATH: {text2video_root}
     # get background pictures
+    - GET_FILE_KEY_VALUE: -f apikeys.yaml
     - COMMAND: python3 downpics.py ./apikeys.yaml '{keywords}' 20 ./tmp --if {t2v}
     
     # # step 2: Split init video into pieces
@@ -65,9 +65,8 @@ Tube:
 
     # Add weathers
     - PATH: {text2video_root}
-    - COMMAND: python3 weathers.py weathers.txt
+    - COMMAND: python3 weathers.py {HEFENG_API_KEY} 'beijing,shanghai,shenzhen,chongqing,xian,sanya,changchun' weathers.txt
     - GET_FILE_KEY_VALUE: -f weathers.txt
-    - SET_VARIABLE: -n weathers -v {Shanghai}{SPACE}{Beijing}{SPACE}{Guangzhou}{SPACE}{Shenzhen}{SPACE}
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
         ffmpeg -i {output_final_prefix}t2.mp4 
@@ -75,7 +74,7 @@ Tube:
                fontcolor=yellow:
                fontsize=50:
                text='{weathers}':
-               x=mod(150*t\,w+tw)-tw:y=5:
+               x=mod(150*t\,w+tw)-tw:y=1:
                box=1:boxcolor=black@0.8"
           -codec:a copy -y {output_final_prefix}t3.mp4
     

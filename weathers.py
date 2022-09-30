@@ -1,76 +1,145 @@
-import json
-import urllib.request
+import requests
+from datetime import datetime
+import locale
 import sys
 
-file_name = 'weathers.txt'
-if len(sys.argv) >= 2:
-    file_name = sys.argv[1]
+'''
+    args:
+        api_key: str # hefeng api key
+        cities: str  # comma seperated city/location list
+        file: str    # save result to file
+'''
 
-# 北上广深
-cityList_bsgs = [
-    {'code': "101010100", 'name': "北京", 'name_en': "Beijing"},
-    {'code': "101020100", 'name': "上海", 'name_en': "Shanghai"},
-    {'code': "101280101", 'name': "广州", 'name_en': "Guangzhou"},
-    {'code': "101280601", 'name': "深圳", 'name_en': "Shenzhen"}
-]
+hf_api_key = '186a1f8bf167428689a82656efe70106'
+cities = '北京,上海,深圳,三亚,重庆,西安,长春'
+weather_file = 'weathers.txt'
 
-def getCityWeather_RealTime(cityID):
-    url = "http://www.weather.com.cn/data/sk/" + str(cityID) + ".html"
+argv_count = len(sys.argv)
+
+class Weather(object):
+    
+    def __init__(self) -> None:
+        self.update_time = None
+        self.today = None
+
+class HefengWeather(object):
+    
+    location_url = 'https://geoapi.qweather.com/v2/city/lookup?key={0}&location={1}'
+    weather_url = 'https://devapi.qweather.com/v7/weather/3d?key={0}&location={1}&lang=zh'
+
+    requests = requests
+    today = datetime.today().day
+    weekday = datetime.today().weekday()
+    week = {0:"星期一",1:"星期二",2:"星期三",3:"星期四",4:"星期五",5:"星期六",6:"星期天"}
+
+    def __getday(self)->str:
+        day = str(self.today)+"日"+self.week.get(self.weekday)
+        return day
+
+    def get_location_info(self, location: str):
+        url = self.location_url.format(hf_api_key, location)        
+        '''
+        "code": "200",
+        "location": [
+            {
+            "name": "上海",
+            "id": "101020100",
+            "lat": "31.23170",
+            "lon": "121.47264",
+            "adm2": "上海",
+            "adm1": "上海市",
+            "country": "中国",
+            "tz": "Asia/Shanghai",
+            "utcOffset": "+08:00",
+            "isDst": "0",
+            "type": "city",
+            "rank": "11",
+            "fxLink": "http://hfx.link/2bc1"
+            },
+        '''
+        l = requests.get(url).json()
+        if l['code'] == '200':
+            return l['location'][0]
+        else:
+            return None
+    
+    def get_weather_by_location_id(self, location_id: str):
+        url = self.weather_url.format(hf_api_key, location_id)
+        w = requests.get(url).json()
+        '''
+        weather return format:
+            'code': '200',
+            'updateTime': '2022-09-30T09:35+08:00',
+            'fxLink': 'http://hfx.link/2bc1',
+            'daily': [
+                {
+                'fxDate': '2022-09-30',
+                'sunrise': '05:47',
+                'sunset': '17:42',
+                'moonrise': '09:59',
+                'moonset': '20:27',
+                'moonPhase': '峨眉月',
+                'moonPhaseIcon': '801',
+                'tempMax': '27',
+                'tempMin': '24',
+                'iconDay': '101',
+                'textDay': '多云',
+                'iconNight': '151',
+                'textNight': '多云',
+                'wind360Day': '135',
+                'windDirDay': '东南风',
+                'windScaleDay': '3-4',
+                'windSpeedDay': '16',
+                'wind360Night': '135',
+                'windDirNight': '东南风',
+                'windScaleNight': '1-2',
+                'windSpeedNight': '3',
+                'humidity': '96',
+                'precip': '0.0',
+                'pressure': '1013',
+                'vis': '25',
+                'cloud': '25',
+                'uvIndex': '2'
+                },
+        '''
+
+        if w['code'] == '200':
+            weather = Weather()
+            weather.update_time = w['updateTime']
+            weather.today = w['daily'][0]
+            return weather
+        else:
+            return None        
+        
+if __name__ == '__main__':    
+    
     try:
-        stdout = urllib.request.urlopen(url)
-        weatherInfomation = stdout.read().decode('utf-8')
-
-        jsonDatas = json.loads(weatherInfomation)
-
-        city = jsonDatas["weatherinfo"]["city"]
-        temp = jsonDatas["weatherinfo"]["temp"]
-        fx = jsonDatas["weatherinfo"]["WD"]  # 风向
-        fl = jsonDatas["weatherinfo"]["WS"]  # 风力
-        sd = jsonDatas["weatherinfo"]["SD"]  # 相对湿度
-        tm = jsonDatas["weatherinfo"]["time"]
-
-        content = "#" + city + "#" + " " + temp + "℃ " + \
-            fx + fl + " " + "相对湿度" + sd + " " + "发布时间:" + tm
-        twitter = {'image': "", 'message': content}
-
-    except (SyntaxError) as err:
-        print(">>>>>> SyntaxError: " + err.args)
-    except:
-        print(">>>>>> OtherError: ")
-    else:
-        return twitter
-    finally:
-        None
-
-def getCityWeather_AllDay(cityID):
-    url = "http://www.weather.com.cn/data/cityinfo/" + str(cityID) + ".html"
-    try:
-        stdout = urllib.request.urlopen(url)
-        weatherInfomation = stdout.read().decode('utf-8')
-        jsonDatas = json.loads(weatherInfomation)
-
-        city        = jsonDatas["weatherinfo"]["city"]
-        temp1       = jsonDatas["weatherinfo"]["temp1"]
-        temp2       = jsonDatas["weatherinfo"]["temp2"]
-        weather     = jsonDatas["weatherinfo"]["weather"]
-        img1        = jsonDatas["weatherinfo"]["img1"]
-        img2        = jsonDatas["weatherinfo"]["img2"]
-        ptime        = jsonDatas["weatherinfo"]["ptime"]
-
-        content = city + "," + weather + ",最高气温:" + temp2 + ",最低气温:"  + temp1 + ",发布时间:" + ptime
-        twitter = {'image': "icon\d" + img1, 'message': content}
-
-    except (SyntaxError) as err:
-        print(">>>>>> SyntaxError: " + err.args)
-    except:
-        print(">>>>>> OtherError: ")
-    else:
-        return twitter
-    finally:
-        None
-
-with open(file_name, 'w') as f:
-    for item in cityList_bsgs:
-        #print(getCityWeather_RealTime(item['code'])['message'])
-        line = item['name_en'] + '=' + getCityWeather_AllDay(item['code'])['message'].replace(':', '\\:') + '\n'
-        f.write(line)
+        # deal with user inputs
+        if argv_count >= 2:
+            hf_api_key = sys.argv[1]
+        if argv_count >= 3:
+            cities = sys.argv[2]
+        if argv_count >= 4:
+            weather_file = sys.argv[3]
+        
+        # get weather by location list
+        weather = HefengWeather()    
+        citiy_list = cities.split(',')
+        locale.setlocale(locale.LC_TIME, "zh_CN")
+        out = ''
+        for city in citiy_list:
+            try:
+                city_detail = weather.get_location_info(city)
+                w_detail = weather.get_weather_by_location_id(city_detail['id'])
+                if len(out) == 0:
+                    date_time_obj = datetime.now()
+                    out = '[' + date_time_obj.strftime('%Y年%b月%d日 %A').replace(' ', '') + ']'
+                out += ' ' + city_detail['name'] + ': ' + w_detail.today['tempMin'] + '-' + w_detail.today['tempMax'] + '℃  ' +  w_detail.today['textDay'] + ' ' + w_detail.today['windDirDay'] + ' ' + w_detail.today['windScaleDay'] + '级;'
+            except Exception as e:
+                print("ERROR: " + str(e))
+        with open(weather_file, 'w') as f:
+            f.write('weathers=' + out.replace(':', '\\:'))
+    except Exception as e:
+        print("ERROR: " + str(e))
+        
+        
