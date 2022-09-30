@@ -65,7 +65,7 @@ Tube:
 
     # Add weathers
     - PATH: {text2video_root}
-    - COMMAND: python3 weathers.py {HEFENG_API_KEY} 'beijing,shanghai,shenzhen,chongqing,xian,sanya,changchun' weathers.txt
+    - COMMAND: python3 weathers.py {HEFENG_API_KEY} 'changchun,sanya,xian,chongqing,shenzhen,shanghai,beijing' weathers.txt
     - GET_FILE_KEY_VALUE: -f weathers.txt
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
