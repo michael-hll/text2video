@@ -1,9 +1,26 @@
 import requests
+import sys,os
+from utility import Utility
+
+key_file = './apikeys.yaml'
+keywords = 'microsoft'
+count = 20
+out_dir = './tmp'
+pic_name = 'bg{:02d}.jpg'
+if len(sys.argv) >= 3:
+    key_file = sys.argv[1]
+    keywords = sys.argv[2]
+if len(sys.argv) >=4:
+    count = int(sys.argv[3])
+if len(sys.argv) >=5:
+    out_dir = sys.argv[4]
+if len(sys.argv) >=6:
+    pic_name = sys.argv[5]
 
 # https://portal.azure.com/?quickstart=true#home
-subscription_key = "<API KEY>"
+subscription_key=Utility.get_api_key(key_file, 'MICROSOFTY_API_KEY')
 search_url = "https://api.bing.microsoft.com/v7.0/images/search"
-search_term = "凤凰传奇"
+search_term = keywords
 headers = {"Ocp-Apim-Subscription-Key" : subscription_key}
 params  = {"q": search_term}
 
@@ -11,6 +28,26 @@ response = requests.get(search_url, headers=headers, params=params)
 response.raise_for_status()
 search_results = response.json()
 print(search_results)
+
+# download photos by keywords
+i = 0
+for pic in search_results['value']:    
+    url = pic['contentUrl']
+    width = pic['width']
+    height = pic['height']
+    if width < height:
+      pass
+      #continue
+    print('Downloading: {0}'.format(url))
+    try:
+        r = requests.get(url, verify=False, timeout=2)
+        with open(os.path.join(out_dir, pic_name.format(i)), 'wb') as f:
+            f.write(r.content)
+            i += 1
+        if i >= count:
+          break
+    except Exception as e:
+        print('Download picture fail:' + str(e))
 
 '''
 {

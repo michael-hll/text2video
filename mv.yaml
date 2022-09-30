@@ -8,7 +8,8 @@ Variables:
     output_final_prefix: 'video_final_'
     media_type: 科技
     SPACE: '      '
-    t2v: yes # If re-generate the 'video_init.mp4'    
+    t2v: yes # If re-generate the 'video_init.mp4'   
+    del: yes 
 Tube:
     # step 1: Get 'video_init.mp4'
     - PATH: {downloads}
@@ -96,7 +97,7 @@ Tube:
     # # Step 6: Genearte the final one
     - PATH: '{text2video_root}/tmp'
     - COMMAND: cp -f {output_final_prefix}media_type.mp4 {output_final}
-    - COMMAND: rm -f video_init_*.mp4 --continue
-    - COMMAND: rm -f video_final_*.mp4 --continue
-    - COMMAND: rm filelist.txt --continue
+    - COMMAND: rm -f video_init_*.mp4 --continue --if {del}
+    - COMMAND: rm -f video_final_*.mp4 --continue --if {del}
+    - COMMAND: rm filelist.txt --continue --if {del}
     - COMMAND: ffplay {output_final}
