@@ -10,7 +10,7 @@ import sys
         file: str    # save result to file
 '''
 
-hf_api_key = '186a1f8bf167428689a82656efe70106'
+hf_api_key = '<API KEY>'
 cities = '北京,上海,深圳,三亚,重庆,西安,长春'
 weather_file = 'weathers.txt'
 
