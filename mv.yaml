@@ -9,6 +9,7 @@ Variables:
     media_type: 科技
     SPACE: '      '
     t2v: yes # If re-generate the 'video_init.mp4'   
+    dpics: yes
     del: yes 
 Tube:
     # step 1: Get 'video_init.mp4'
@@ -20,7 +21,7 @@ Tube:
     # Wating the video download to be finished
     - PAUSE: 0.2 --if {t2v}
     - PATH: {downloads}
-    - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{LCB}print "vname="$NF{RCB}' > video_init_name.txt --if {t2v}
+    - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{print "vname="$NF}' > video_init_name.txt --if {t2v}
     - PAUSE: 0.05
     - GET_FILE_KEY_VALUE: -f video_init_name.txt
     - PATH: {text2video_root}
@@ -28,11 +29,11 @@ Tube:
     - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4  --if {t2v}
     # remove backgound pictures  
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: rm bg*.jpg --continue --if {t2v}
+    - COMMAND: rm bg*.jpg --continue --if {dpics}
     - PATH: {text2video_root}
     # get background pictures
     - GET_FILE_KEY_VALUE: -f apikeys.yaml
-    - COMMAND: python3 downpics.py ./apikeys.yaml '{keywords}' 20 ./tmp --if {t2v}
+    - COMMAND: python3 downpics.py ./apikeys.yaml '{keywords}' 20 ./tmp --if {dpics}
     
     # # step 2: Split init video into pieces
     # # currently it seems limition be default it could split them into 10 seconds
