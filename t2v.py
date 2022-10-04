@@ -32,7 +32,7 @@ reporters = {
     10: {'name': '晋龙', 'sex': 'M'},
     11: {'name': '寒云', 'sex': 'M'},
              }    
-suggest_reporters = [0,1,2,4,5,7,9]
+suggest_reporters = [0,1,4,5,7,9]
 selected_reporter = '慕瑶'
 
 def exe_command(command):
@@ -139,12 +139,24 @@ def get_init_video(article):
             break
         
         cloth_index = random.randrange(0, clothes)
-        color_index = random.randrange(clothes, total)
+        color_index = random.randrange(clothes, total)        
         # 选择衣服
+        print('Cloth index: {0}, Color index: {1}, divs len: {2}'.format(cloth_index, color_index, len(divs)))
         divs[cloth_index].click()
         time.sleep(2)
         divs = driver.find_elements(By.XPATH, "//div[contains(@class, '_1JxXrgZAWgtvq6gz6q99v3')]")
+        total = len(divs)
+        clothes = 0
+        for div in divs:
+            # find its parent div
+            parent = div.find_element(By.XPATH, '..')
+            child_divs = parent.find_elements(By.XPATH, './div')
+            clothes = len(child_divs)
+            break
+        cloth_index = random.randrange(0, clothes)
+        color_index = random.randrange(clothes, total) 
         # 选择颜色
+        print('Cloth index: {0}, Color index: {1}, divs len: {2}'.format(cloth_index, color_index, len(divs)))
         divs[color_index].click()
         time.sleep(2)
         
@@ -248,13 +260,29 @@ def get_init_video(article):
             
             # 下载
             downDiv.click()
-            time.sleep(2)            
+            time.sleep(3)
+            
+            # 打开more 菜单            
+            child_divs = div.find_elements(By.XPATH, './div')
+            child_divs = child_divs[0].find_elements(By.XPATH, './div')
+            more_div = child_divs[len(child_divs) - 1]
+            more_div.click()
+            time.sleep(0.1)   
+            
+            # 下载字幕
+            # # ant-dropdown-menu-item ant-dropdown-menu-item-only-child
+            lis = driver.find_elements(By.XPATH, "//li[contains(@class, 'ant-dropdown-menu-item ant-dropdown-menu-item-only-child')]")   
+            lis[0].click()
+            time.sleep(0.5)       
             
             # todo: delete 
             # moreDiv = div.find_element(By.XPATH, "//div[contains(@class, 'more__')]")
             # if moreDiv:
             #     moreDiv.click()
-            break      
+            break    
+        
+        
+        
             
     except Exception as e:
         print('=== Exception: ' + str(e))
