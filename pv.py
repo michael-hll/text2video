@@ -47,7 +47,7 @@ with open(file_list, 'w') as f:
         scale = ''
         overlay_pos = ''
         if i > 0 and i < (count - 1):
-            scale = ',scale=-1:400'
+            scale = ',crop=1920:950:0:0,scale=-1:400'
             overlay_pos = '=W-w+100:50'
         ffmpeg_cmd = "ffmpeg -y -i {0} -i {1} -filter_complex '[0:v]colorkey=0x00ff00:0.2:0.3{2}[ckout];[1:v]scale=1920:1080[bg],[bg][ckout]overlay{3}[out]' -map '[out]' -map 0:a:0 -c:a copy {4}"
         ffmpeg_cmd = ffmpeg_cmd.format(video_name, img_name, scale, overlay_pos, video_output)
