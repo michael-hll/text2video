@@ -15,6 +15,7 @@ Tube:
     # step 1: Get 'video_init.mp4'
     - PATH: {downloads}
     - COMMAND: rm 未命名*.mp4 --continue
+    - COMMAND: rm *.ass --continue
     - PATH: {text2video_root}
     - GET_FILE_KEY_VALUE: -f ./article.yaml --override
     - COMMAND: python3 t2v.py ./article.yaml --if {t2v}    
@@ -22,11 +23,16 @@ Tube:
     - PAUSE: 0.2 --if {t2v}
     - PATH: {downloads}
     - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{print "vname="$NF}' > video_init_name.txt --if {t2v}
+    # get subtitle file
+    - COMMAND: ls -tr ./*.ass | tail -1 | awk -F '/' '{print "cname="$NF}' > caption_init_name.txt --if {t2v}
     - PAUSE: 0.05
-    - GET_FILE_KEY_VALUE: -f video_init_name.txt
+    # load video name and caption init name to variables
+    - GET_FILE_KEY_VALUE: -f video_init_name.txt --if {t2v}
+    - GET_FILE_KEY_VALUE: -f caption_init_name.txt --if {t2v}
     - PATH: {text2video_root}
     - COMMAND: mkdir -p ./tmp
     - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4  --if {t2v}
+    - COMMAND: cp -f '{downloads}/{cname}' {text2video_root}/tmp/subtitle.ass  --if {t2v}
     # remove backgound pictures  
     - PATH: '{text2video_root}/tmp'
     - COMMAND: rm bg*.jpg --continue --if {dpics}
@@ -62,8 +68,14 @@ Tube:
         ffmpeg -y -i {output_final_prefix}t1.mp4
         -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{sub_title}':
         fontcolor=#2B39FF:fontsize=60:enable='between(t,0,5)':
-        box=1:boxcolor=yellow@0.5:boxborderw=5:x=(w-text_w)/2:y=(h/2 + 3*text_h):expansion=none"
+        box=1:boxcolor=yellow@0.8:boxborderw=5:x=(w-text_w)/2:y=(h/2 + 2.5*text_h):expansion=none"
         -codec:a copy -y {output_final_prefix}t2.mp4
+    # add sub title backend box
+    - COMMAND: >
+        ffmpeg -y -i {output_final_prefix}t2.mp4 -vf "drawbox=x=300:y=945:w=1320:h=80:color=black@0.8:t=fill" {output_final_prefix}t2_1.mp4
+    # add subtitle
+    - COMMAND: >
+        ffmpeg -y -i {output_final_prefix}t2_1.mp4 -vf 'ass=subtitle.ass' -c:a copy {output_final_prefix}t2c.mp4
 
     # Add weathers
     - PATH: {text2video_root}
@@ -71,7 +83,7 @@ Tube:
     - GET_FILE_KEY_VALUE: -f weathers.txt
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
-        ffmpeg -i {output_final_prefix}t2.mp4 
+        ffmpeg -i {output_final_prefix}t2c.mp4 
           -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                fontcolor=yellow:
                fontsize=50:
@@ -92,7 +104,7 @@ Tube:
         ffmpeg -y -i {output_final_draft_tl} -i Rnews.jpg
         -filter_complex 
             "[1:v]colorkey=0x00ff00:0.3:0.2[ckout];
-            [0:v][ckout]overlay=x=-50:y=980[out]" 
+            [0:v][ckout]overlay=x=-50:y=935[out]" 
         -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}media_type.mp4
 
     # # Step 6: Genearte the final one
