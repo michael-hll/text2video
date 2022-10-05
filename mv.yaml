@@ -6,6 +6,7 @@ Variables:
     output_final_prefix: 'video_final_'
     media_type: 科技
     SPACE: '      '
+    downloaded: no
     t2v: yes # If re-generate the 'video_init.mp4'   
     dpics: yes
     del: yes 
@@ -18,7 +19,7 @@ Tube:
     - GET_FILE_KEY_VALUE: -f ./article.yaml --override
     - COMMAND: python3 t2v.py ./article.yaml --if {t2v}    
     # Wating the video download to be finished
-    - PAUSE: 0.2 --if {t2v}
+    - RUN_TUBE: -y wv.yaml -w {downloaded} == no --if {t2v}
     - PATH: {downloads}
     # get video download file name
     - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{print "vname="$NF}' > video_init_name.txt --if {t2v}
