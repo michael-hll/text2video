@@ -2,8 +2,6 @@ Variables:
     text2video_root: /volumes/macdrive/projects/text2video
     downloads: /Users/lianglianghan/downloads
     output_final_draft: 'video_final_draft.mp4'
-    output_final_draft_t: 'video_final_draft_t.mp4'
-    output_final_draft_tl: 'video_final_draft_tl.mp4'
     output_final: 'video_final.mp4'
     output_final_prefix: 'video_final_'
     media_type: 科技
@@ -12,18 +10,19 @@ Variables:
     dpics: yes
     del: yes 
 Tube:
-    # step 1: Get 'video_init.mp4'
+    # step 1: Get 'video_init.mp4' and backgournd pictures
     - PATH: {downloads}
-    - COMMAND: rm 未命名*.mp4 --continue
-    - COMMAND: rm *.ass --continue
+    - COMMAND: rm 未命名*.mp4 --continue --if {del}
+    - COMMAND: rm *.ass --continue --if {del}
     - PATH: {text2video_root}
     - GET_FILE_KEY_VALUE: -f ./article.yaml --override
     - COMMAND: python3 t2v.py ./article.yaml --if {t2v}    
     # Wating the video download to be finished
     - PAUSE: 0.2 --if {t2v}
     - PATH: {downloads}
+    # get video download file name
     - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{print "vname="$NF}' > video_init_name.txt --if {t2v}
-    # get subtitle file
+    # get subtitle file name
     - COMMAND: ls -tr ./*.ass | tail -1 | awk -F '/' '{print "cname="$NF}' > caption_init_name.txt --if {t2v}
     - PAUSE: 0.05
     # load video name and caption init name to variables
@@ -35,7 +34,7 @@ Tube:
     - COMMAND: cp -f '{downloads}/{cname}' {text2video_root}/tmp/subtitle.ass  --if {t2v}
     # remove backgound pictures  
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: rm bg*.jpg --continue --if {dpics}
+    - COMMAND: rm bg*.jpg --continue --if {dpics} {del}
     - PATH: {text2video_root}
     # get background pictures
     - GET_FILE_KEY_VALUE: -f apikeys.yaml
@@ -72,10 +71,10 @@ Tube:
         -codec:a copy -y {output_final_prefix}t2.mp4
     # add sub title backend box
     - COMMAND: >
-        ffmpeg -y -i {output_final_prefix}t2.mp4 -vf "drawbox=x=300:y=945:w=1320:h=80:color=black@0.8:t=fill" {output_final_prefix}t2_1.mp4
+        ffmpeg -y -i {output_final_prefix}t2.mp4 -vf "drawbox=x=300:y=945:w=1320:h=80:color=black@0.8:t=fill" {output_final_prefix}t2b.mp4
     # add subtitle
     - COMMAND: >
-        ffmpeg -y -i {output_final_prefix}t2_1.mp4 -vf 'ass=subtitle.ass' -c:a copy {output_final_prefix}t2c.mp4
+        ffmpeg -y -i {output_final_prefix}t2b.mp4 -vf 'ass=subtitle.ass' -c:a copy {output_final_prefix}t2bc.mp4
 
     # Add weathers
     - PATH: {text2video_root}
@@ -83,7 +82,7 @@ Tube:
     - GET_FILE_KEY_VALUE: -f weathers.txt
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
-        ffmpeg -i {output_final_prefix}t2c.mp4 
+        ffmpeg -i {output_final_prefix}t2bc.mp4 
           -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                fontcolor=yellow:
                fontsize=50:
@@ -97,19 +96,19 @@ Tube:
     - COMMAND: >
         ffmpeg -y -i {output_final_prefix}t3.mp4 -i cnBeta.png 
         -filter_complex "[1:v]colorkey=0xffffff:0.3:0.2[ckout];[0:v][ckout]overlay=50:80[out]" 
-        -map "[out]" -map 0:a:0 -c:a copy {output_final_draft_tl}
+        -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}tl.mp4
     
     # logo
     - COMMAND: >
-        ffmpeg -y -i {output_final_draft_tl} -i Rnews.jpg
+        ffmpeg -y -i {output_final_prefix}tl.mp4 -i Rnews.jpg
         -filter_complex 
             "[1:v]colorkey=0x00ff00:0.3:0.2[ckout];
             [0:v][ckout]overlay=x=-50:y=935[out]" 
-        -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}media_type.mp4
+        -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}tl2.mp4
 
     # # Step 6: Genearte the final one
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: cp -f {output_final_prefix}media_type.mp4 {output_final}
+    - COMMAND: cp -f {output_final_prefix}tl2.mp4 {output_final}
     - COMMAND: rm -f video_init_*.mp4 --continue --if {del}
     - COMMAND: rm -f video_final_*.mp4 --continue --if {del}
     - COMMAND: rm filelist.txt --continue --if {del}

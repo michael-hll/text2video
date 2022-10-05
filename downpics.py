@@ -71,22 +71,35 @@ for pic in search_pics_response.body['photos']:
     print('Downloading: {0}'.format(url))
     try:
         r = requests.get(url)
-        with open(os.path.join(out_dir, pic_name.format(i)), 'wb') as f:
-            f.write(r.content)
+        with open(os.path.join(out_dir, pic_name.format(i)), 'wb') as default_f:
+            default_f.write(r.content)
             i += 1
     except Exception as e:
         print('Download picture fail:' + str(e))
         
 # check default photos     
 default_dir = out_dir + '/default-bg'
-i = 0
+j = 0
 for filename in os.listdir(default_dir):
-    f = os.path.join(default_dir, filename)    
-    # replace the original background
-    target_f = os.path.join(out_dir + '/' + pic_name.format(i))
-    i += 1
+    
+    # get the default pic file name
+    default_f = os.path.join(default_dir, filename)    
+    
+    # get the target need to be replaced file name
+    target_f = os.path.join(out_dir + '/' + pic_name.format(j))
+    
+    # move the target file to new    
+    target_f_new = os.path.join(out_dir + '/' + pic_name.format(i))
     if(os.path.exists(target_f)):
-        os.remove(target_f)
-    shutil.move(f, target_f)
+        if(os.path.exists(target_f_new)):
+            os.remove(target_f_new)
+        shutil.move(target_f, target_f_new)
+        i += 1
+    
+    # replace the target file with default background    
+    if(os.path.exists(target_f)):
+        os.remove(target_f)   
+    shutil.move(default_f, target_f)
+    j += 1
  
   
