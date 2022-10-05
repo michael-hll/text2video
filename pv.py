@@ -13,9 +13,8 @@ if len(sys.argv) >= 2:
 os.chdir(folder)
 
 def exe_command(command):
-    command_array = shlex.split(command, posix=True)
     print('Runing command: {0}'.format(command))
-    result = subprocess.Popen(command_array, text=True, stdout=sys.stdout, stderr=sys.stderr)
+    result = subprocess.Popen(command, text=True, shell=True, stdout=sys.stdout, stderr=sys.stderr)
     result.communicate()     
     if result.returncode != 0: 
         print("Running command '{}' failed.".format(command))
