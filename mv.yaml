@@ -10,6 +10,15 @@ Variables:
     t2v: yes # If re-generate the 'video_init.mp4'   
     dpics: yes
     del: yes 
+    # settings for dynamic drawing text
+    start: 6
+    duration: 5
+    text: Hello Mac
+    font_size: 40
+    delta_h: 45
+    x: (w-text_w)/2
+    y: h-th-20
+    color: white
 Tube:
     # step 1: Get 'video_init.mp4' and backgournd pictures
     - PATH: {downloads}
@@ -107,9 +116,41 @@ Tube:
             [0:v][ckout]overlay=x=-50:y=935[out]" 
         -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}tl2.mp4
 
+    # Add dynamic dates detail text
+    - PATH: {text2video_root}
+    - COMMAND: python3 gdates.py
+    - GET_FILE_KEY_VALUE: -f date_detail.txt
+    - PATH: '{text2video_root}/tmp'
+
+    # draw gongli
+    - SET_VARIABLE: -n text -v {gongli} {xingqi} [{xingzuo}]    
+    - SET_VARIABLE: -n x -v 100
+    - SET_VARIABLE: -n y -v 1080/3*2
+    - SET_VARIABLE: -n dt_input -v {output_final_prefix}tl2.mp4 
+    - SET_VARIABLE: -n dt_output -v {output_final_prefix}tl2_dates.mp4  
+    - RUN_TUBE: -y ../dtext.yaml
+
+    # draw nongli
+    - SET_VARIABLE: -n text -v {yTG_DZ}{nongli} {shengXiao}
+    - SET_VARIABLE: -n y -v 1080/3*2 + {delta_h}
+    - SET_VARIABLE: -n start -v {start} + 2
+    - SET_VARIABLE: -n dt_input -v {output_final_prefix}tl2_dates.mp4 
+    - SET_VARIABLE: -n dt_output -v {output_final_prefix}tl2_dates2.mp4 
+    - SET_VARIABLE: -n font_size -v {font_size} - 8
+    - RUN_TUBE: -y ../dtext.yaml
+
+    # draw jieqi
+    - SET_VARIABLE: -n text -v {jieQi} {jieQi_Date}
+    - SET_VARIABLE: -n y -v 1080/3*2 + {delta_h} * 2
+    - SET_VARIABLE: -n start -v {start} + 2
+    - SET_VARIABLE: -n dt_input -v {output_final_prefix}tl2_dates2.mp4  
+    - SET_VARIABLE: -n dt_output -v {output_final_prefix}tl2_dates3.mp4 
+    - SET_VARIABLE: -n font_size -v {font_size} - 8
+    - RUN_TUBE: -y ../dtext.yaml
+
     # # Step 6: Genearte the final one
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: cp -f {output_final_prefix}tl2.mp4 {output_final}
+    - COMMAND: cp -f {output_final_prefix}tl2_dates3.mp4  {output_final}
     - COMMAND: rm -f video_init_*.mp4 --continue --if {del}
     - COMMAND: rm -f video_final_*.mp4 --continue --if {del}
     - COMMAND: rm filelist.txt --continue --if {del}
