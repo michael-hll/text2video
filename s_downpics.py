@@ -1,5 +1,5 @@
 from pypexels import PyPexels
-from utility import Utility
+from s_utility import Utility
 import requests, sys, os
 import shutil
 
@@ -41,7 +41,7 @@ Description: Download pictures from Pexels api
     Arg 5: Picture name format eg: bg{:02d}.jpg
 '''
 
-key_file = './apikeys.yaml'
+key_file = './t_apikeys.yaml'
 keywords = 'pexels'
 count = 15
 out_dir = './tmp'

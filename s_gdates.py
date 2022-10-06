@@ -2,7 +2,7 @@ import datetime
 import sxtwl
 import sys
 
-file = './date_detail.txt'
+file = './d_date_detail.txt'
 
 if len(sys.argv) >= 2:
     file = sys.argv[1]
@@ -34,7 +34,7 @@ print("星座:", xingZuo)
 
 # 农历
 #nongli = "%d年%s%d月%d日" % (day.getLunarYear(), '闰' if day.isLunarLeap() else '', day.getLunarMonth(), day.getLunarDay())
-nongli = "年%s%d月%d日" % ('闰' if not day.isLunarLeap() else '', day.getLunarMonth(), day.getLunarDay())
+nongli = "年%s%d月%d日" % ('闰' if day.isLunarLeap() else '', day.getLunarMonth(), day.getLunarDay())
 print(nongli)
 
 # 以春节为界的天干地支 

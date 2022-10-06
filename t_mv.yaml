@@ -12,7 +12,7 @@ Variables:
     video_duration:
     start: 6
     duration: 5
-    text: Hello Mac
+    text: TEXT
     font_size: 55
     delta_h: 60
     x: (w-text_w)/2
@@ -24,10 +24,10 @@ Tube:
     - COMMAND: rm 未命名*.mp4 --continue --if {del}
     - COMMAND: rm *.ass --continue --if {del}
     - PATH: {text2video_root}
-    - GET_FILE_KEY_VALUE: -f ./article.yaml --override
-    - COMMAND: python3 t2v.py ./article.yaml --if {t2v}    
+    - GET_FILE_KEY_VALUE: -f ./t_article.yaml --override
+    - COMMAND: python3 s_t2v.py ./t_article.yaml --if {t2v}    
     # Wating the video download to be finished
-    - RUN_TUBE: -y wv.yaml -w {downloaded} == no --if {t2v}
+    - RUN_TUBE: -y t_wv.yaml -w {downloaded} == no --if {t2v}
     - PATH: {downloads}
     # get video download file name
     - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{print "vname="$NF}' > video_init_name.txt --if {t2v}
@@ -46,8 +46,8 @@ Tube:
     - COMMAND: rm bg*.jpg --continue --if {dpics} {del}
     - PATH: {text2video_root}
     # get background pictures
-    - GET_FILE_KEY_VALUE: -f apikeys.yaml
-    - COMMAND: python3 downpics.py ./apikeys.yaml '{keywords}' 20 ./tmp --if {dpics}
+    - GET_FILE_KEY_VALUE: -f t_apikeys.yaml
+    - COMMAND: python3 s_downpics.py ./t_apikeys.yaml '{keywords}' 20 ./tmp --if {dpics}
     
     # # step 2: Split init video into pieces
     # # currently it seems limition be default it could split them into 10 seconds
@@ -62,7 +62,7 @@ Tube:
     # # step 3: Add background for each splited videos
     # # and output combined video: video_final_draft.mp4
     - PATH: {text2video_root}
-    - COMMAND: python3 pv.py ./tmp
+    - COMMAND: python3 s_pv.py ./tmp
 
     # # step 4: Add title
     - PATH: '{text2video_root}/tmp'
@@ -87,8 +87,8 @@ Tube:
 
     # Add weathers
     - PATH: {text2video_root}
-    - COMMAND: python3 weathers.py {HEFENG_API_KEY} 'changchun,sanya,xian,chongqing,shenzhen,shanghai,beijing' weathers.txt
-    - GET_FILE_KEY_VALUE: -f weathers.txt
+    - COMMAND: python3 s_weathers.py {HEFENG_API_KEY} 'changchun,sanya,xian,chongqing,shenzhen,shanghai,beijing' d_weathers.txt
+    - GET_FILE_KEY_VALUE: -f d_weathers.txt
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
         ffmpeg -i {output_final_prefix}t2bc.mp4 
@@ -117,8 +117,8 @@ Tube:
 
     # Add dynamic dates detail text
     - PATH: {text2video_root}
-    - COMMAND: python3 gdates.py
-    - GET_FILE_KEY_VALUE: -f date_detail.txt
+    - COMMAND: python3 s_gdates.py
+    - GET_FILE_KEY_VALUE: -f d_date_detail.txt
     - PATH: '{text2video_root}/tmp'
 
     # draw gongli
@@ -127,7 +127,7 @@ Tube:
     - SET_VARIABLE: -n y -v 1080/3*2
     - SET_VARIABLE: -n dt_input -v {output_final_prefix}tl2.mp4 
     - SET_VARIABLE: -n dt_output -v {output_final_prefix}tl2_dates.mp4  
-    - RUN_TUBE: -y ../dtext.yaml
+    - RUN_TUBE: -y ../t_dtext.yaml
 
     # draw nongli
     - SET_VARIABLE: -n text -v {yTG_DZ}{nongli} {shengXiao}
@@ -136,7 +136,7 @@ Tube:
     - SET_VARIABLE: -n dt_input -v {output_final_prefix}tl2_dates.mp4 
     - SET_VARIABLE: -n dt_output -v {output_final_prefix}tl2_dates2.mp4 
     - SET_VARIABLE: -n font_size -v {font_size} - 8
-    - RUN_TUBE: -y ../dtext.yaml
+    - RUN_TUBE: -y ../t_dtext.yaml
 
     # draw jieqi
     - SET_VARIABLE: -n text -v {jieQi} {jieQi_Date}
@@ -145,12 +145,12 @@ Tube:
     - SET_VARIABLE: -n dt_input -v {output_final_prefix}tl2_dates2.mp4  
     - SET_VARIABLE: -n dt_output -v {output_final_prefix}tl2_dates3.mp4 
     - SET_VARIABLE: -n font_size -v {font_size} - 8
-    - RUN_TUBE: -y ../dtext.yaml
+    - RUN_TUBE: -y ../t_dtext.yaml
 
     # # Step 6: Genearte the final one
     - PATH: '{text2video_root}/tmp'
     - COMMAND: cp -f {output_final_prefix}tl2_dates3.mp4  {output_final}
     - COMMAND: rm -f video_init_*.mp4 --continue --if {del}
     - COMMAND: rm -f video_final_*.mp4 --continue --if {del}
-    - COMMAND: rm filelist.txt --continue --if {del}
+    - COMMAND: rm d_filelist.txt --continue --if {del}
     - COMMAND: ffplay {output_final}

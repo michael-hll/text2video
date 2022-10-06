@@ -12,7 +12,7 @@ import sys
 
 hf_api_key = '<API KEY>'
 cities = '北京,上海,深圳,三亚,重庆,西安,长春'
-weather_file = 'weathers.txt'
+weather_file = 'd_weathers.txt'
 
 argv_count = len(sys.argv)
 

@@ -1,6 +1,6 @@
 import requests
 import sys,os
-from utility import Utility
+from s_utility import Utility
 
 key_file = './apikeys.yaml'
 keywords = 'microsoft'
