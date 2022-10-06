@@ -1,7 +1,7 @@
 Tube:
     - COMMAND: >
         ffmpeg -y {video_duration} -i {dt_input} -filter_complex "
-        drawbox=90:y=1080/3*2-5:color=black@0.03:width=735:height=170:t=fill:enable='between(t,{start},{start}+{duration}+3)',
+        drawbox=90:y=1080/3*2-5:color=black@0.2:width=735:height=170:t=fill:enable='between(t,{start},{start}+{duration}+3)',
         drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
             text='{text}':
             fontsize={font_size}:
