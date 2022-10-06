@@ -2,7 +2,7 @@ Variables:
     downloads: /Users/lianglianghan/downloads
 Tube:
     - PATH: {downloads}
-    - COMMAND: ls 未命名2*.mp4 --continue 1 1
+    - COMMAND: ls 未命名*.mp4 --continue 1 1
     - SET_VARIABLE: -n downloaded -v yes
     - SET_VARIABLE: -n downloaded -v no
     - PAUSE: 0.05
