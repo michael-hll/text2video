@@ -4,8 +4,6 @@ Variables:
     output_final_draft: 'video_final_draft.mp4'
     output_final: 'video_final.mp4'
     output_final_prefix: 'video_final_'
-    media_type: 科技
-    SPACE: '      '
     downloaded: no
     t2v: yes # If re-generate the 'video_init.mp4'   
     dpics: yes
