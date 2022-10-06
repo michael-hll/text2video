@@ -1,10 +1,10 @@
 Tube:
     - COMMAND: >
-        ffmpeg -y -i {dt_input} -filter_complex "
+        ffmpeg -y {video_duration} -i {dt_input} -filter_complex "
         drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
             text='{text}':
             fontsize={font_size}:
-            fontcolor={color}@0.9:
+            fontcolor={color}@1:
             alpha='if(lt(t,{start}),0,
                         if(lt(t,{start}+2),(t-{start})/2,
                             if(lt(t,{start}+{duration}+2),1,

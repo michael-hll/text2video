@@ -11,11 +11,12 @@ Variables:
     dpics: yes
     del: yes 
     # settings for dynamic drawing text
+    video_duration:
     start: 6
     duration: 5
     text: Hello Mac
-    font_size: 40
-    delta_h: 45
+    font_size: 55
+    delta_h: 60
     x: (w-text_w)/2
     y: h-th-20
     color: white
