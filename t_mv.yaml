@@ -17,7 +17,10 @@ Variables:
     delta_h: 60
     x: (w-text_w)/2
     y: h-th-20
-    color: white
+    color_white: white   
+    color_blue: '#3396F0'
+    color_pink: '#F02A6C'
+    color_yellow: '#FFEC1D'
 Tube:
     # step 1: Get 'video_init.mp4' and backgournd pictures
     - PATH: {downloads}
@@ -64,92 +67,128 @@ Tube:
     - PATH: {text2video_root}
     - COMMAND: python3 s_pv.py ./tmp
 
-    # # step 4: Add title
-    - PATH: '{text2video_root}/tmp'
-    - COMMAND: >
-        ffmpeg -y -i {output_final_draft} 
-        -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{title}':
-        fontcolor=yellow:fontsize=125:enable='between(t,0,5)':
-        box=1:boxcolor=black@0.6:boxborderw=5:x=(w-text_w)/2:y=(h/2):expansion=none"
-        -codec:a copy -y {output_final_prefix}t1.mp4
-    - COMMAND: >
-        ffmpeg -y -i {output_final_prefix}t1.mp4
-        -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{sub_title}':
-        fontcolor=#2B39FF:fontsize=60:enable='between(t,0,5)':
-        box=1:boxcolor=yellow@0.8:boxborderw=5:x=(w-text_w)/2:y=(h/2 + 2.5*text_h):expansion=none"
-        -codec:a copy -y {output_final_prefix}t2.mp4
-    # add sub title backend box
-    - COMMAND: >
-        ffmpeg -y -i {output_final_prefix}t2.mp4 -vf "drawbox=x=300:y=945:w=1320:h=80:color=black@0.8:t=fill" {output_final_prefix}t2b.mp4
-    # add subtitle
-    - COMMAND: >
-        ffmpeg -y -i {output_final_prefix}t2b.mp4 -vf 'ass=subtitle.ass' -c:a copy {output_final_prefix}t2bc.mp4
-
-    # Add weathers
+    # # step 4: Add title, captions, weathers
     - PATH: {text2video_root}
     - COMMAND: python3 s_weathers.py {HEFENG_API_KEY} 'changchun,sanya,xian,chongqing,shenzhen,shanghai,beijing' d_weathers.txt
     - GET_FILE_KEY_VALUE: -f d_weathers.txt
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
-        ffmpeg -i {output_final_prefix}t2bc.mp4 
-          -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+        ffmpeg -y -i {output_final_draft} -filter_complex "
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{title}':
+                fontcolor=yellow:fontsize=125:enable='between(t,0,5)':
+                box=1:boxcolor=black@0.6:boxborderw=5:x=(w-text_w)/2:y=(h/2):expansion=none,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{sub_title}':
+                fontcolor=#2B39FF:fontsize=60:enable='between(t,0,5)':
+                box=1:boxcolor=yellow@0.8:boxborderw=5:x=(w-text_w)/2:y=(h/2 + 2.5*text_h):expansion=none,
+            drawbox=x=300:y=945:w=1320:h=80:color=black@0.8:t=fill,
+            ass=subtitle.ass,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                fontcolor=yellow:
                fontsize=50:
                text='{weathers}':
                x=mod(150*t\,w+tw)-tw:y=1:
-               box=1:boxcolor=black@0.8"
-          -codec:a copy -y {output_final_prefix}t3.mp4
+               box=1:boxcolor=black@0.8
+        "
+        -codec:a copy -y {output_final_prefix}tcw.mp4
     
     # # Step 5: Add logo
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
-        ffmpeg -y -i {output_final_prefix}t3.mp4 -i cnBeta.png 
-        -filter_complex "[1:v]colorkey=0xffffff:0.3:0.2[ckout];[0:v][ckout]overlay=50:80[out]" 
-        -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}tl.mp4
+        ffmpeg -y -i {output_final_prefix}tcw.mp4 -i cnBeta.png -i Rnews.jpg
+        -filter_complex "
+            [1:v]colorkey=0xffffff:0.3:0.2[ckout1];
+            [2:v]colorkey=0x00ff00:0.3:0.2[ckout2];
+            [0:v][ckout1]overlay=50:80[out1];
+            [out1][ckout2]overlay=x=-50:y=935[out]" 
+        -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}tcwl.mp4
     
-    # logo
-    - COMMAND: >
-        ffmpeg -y -i {output_final_prefix}tl.mp4 -i Rnews.jpg
-        -filter_complex 
-            "[1:v]colorkey=0x00ff00:0.3:0.2[ckout];
-            [0:v][ckout]overlay=x=-50:y=935[out]" 
-        -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}tl2.mp4
-
-    # Add dynamic dates detail text
+    # Step 6: Add dynamic dates detail text
     - PATH: {text2video_root}
     - COMMAND: python3 s_gdates.py
     - GET_FILE_KEY_VALUE: -f d_date_detail.txt
     - PATH: '{text2video_root}/tmp'
-
-    # draw gongli
-    - SET_VARIABLE: -n text -v {gongli} {xingqi} [{xingzuo}]    
-    - SET_VARIABLE: -n x -v 100
-    - SET_VARIABLE: -n y -v 1080/3*2
-    - SET_VARIABLE: -n dt_input -v {output_final_prefix}tl2.mp4 
-    - SET_VARIABLE: -n dt_output -v {output_final_prefix}tl2_dates.mp4  
-    - RUN_TUBE: -y ../t_dtext.yaml
-
-    # draw nongli
-    - SET_VARIABLE: -n text -v {yTG_DZ}{nongli} {shengXiao}
-    - SET_VARIABLE: -n y -v 1080/3*2 + {delta_h}
-    - SET_VARIABLE: -n start -v {start} + 2
-    - SET_VARIABLE: -n dt_input -v {output_final_prefix}tl2_dates.mp4 
-    - SET_VARIABLE: -n dt_output -v {output_final_prefix}tl2_dates2.mp4 
-    - SET_VARIABLE: -n font_size -v {font_size} - 8
-    - RUN_TUBE: -y ../t_dtext.yaml
-
-    # draw jieqi
-    - SET_VARIABLE: -n text -v {jieQi} {jieQi_Date}
-    - SET_VARIABLE: -n y -v 1080/3*2 + {delta_h} * 2
-    - SET_VARIABLE: -n start -v {start} + 2
-    - SET_VARIABLE: -n dt_input -v {output_final_prefix}tl2_dates2.mp4  
-    - SET_VARIABLE: -n dt_output -v {output_final_prefix}tl2_dates3.mp4 
-    - SET_VARIABLE: -n font_size -v {font_size} - 8
-    - RUN_TUBE: -y ../t_dtext.yaml
-
-    # # Step 6: Genearte the final one
+    - SET_VARIABLE: -n x -v 20
+    - SET_VARIABLE: -n y -v 1080/3*2 
+    # draw dates outer box
+    - COMMAND: >
+        ffmpeg -y {video_duration} -i {output_final_prefix}tcwl.mp4 -filter_complex "
+            drawbox=x={x}-10:y=1080/3*2-8:color=black@0.38:
+                width=600:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+2)',
+            drawbox=x={x}-10:y=1080/3*2-8:color={color_white}@1:
+                width=600:height=170:t=1:enable='between(t,{start},{start}+2+{duration}+2)',
+            drawbox=x={x}+410:y=1080/3*2-8:color={color_white}@0.5:
+                width=1:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+2)'
+        "        
+        -c:a copy
+        {output_final_prefix}tl2_dates.mp4
+    # set text alpha value    
+    - SET_VARIABLE: >
+        -n alpha
+        -v 
+            if(lt(t,{start}),0,
+                if(lt(t,{start}+2),(t-{start})/2,
+                    if(lt(t,{start}+2+{duration}),1,
+                        if(lt(t,{start}+2+{duration}+2),(2-(t-({start}+2+{duration})))/2,
+                            0))))
+    # begin to draw Gongli, Nongli, Xingqi, TianGan, Dizhi    
+    - COMMAND: >
+        ffmpeg -y {video_duration} -i {output_final_prefix}tl2_dates.mp4 -filter_complex "
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{gongli}':
+                fontsize={font_size}:
+                fontcolor={color_white}@1:
+                alpha='{alpha}':
+                x={x}:
+                y={y},
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{yTG_DZ}{nongli}':
+                fontsize={font_size}-10:
+                fontcolor={color_white}@1:
+                alpha='{alpha}':
+                x={x}:
+                y={y}+{delta_h}+4,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{xingqi}':
+                fontsize={font_size}:
+                fontcolor={color_blue}@1:
+                alpha='{alpha}':
+                x={x} + 415:
+                y={y}+{delta_h}*2 - 25,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{xingzuo}':
+                fontsize={font_size} - 28:
+                fontcolor={color_yellow}@1:
+                alpha='{alpha}':
+                x={x} + 455:
+                y={y} + 18,            
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{shengXiao}':
+                fontsize={font_size} - 28:
+                fontcolor={color_yellow}@1:
+                alpha='{alpha}':
+                x={x} + 468:
+                y={y} + 55,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{jieQi}':
+                fontsize={font_size}-20:
+                fontcolor={color_yellow}@1:
+                alpha='{alpha}':
+                x={x}:
+                y={y}+{delta_h}*2,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{jieQi_Date}':
+                fontsize={font_size}-16-10:
+                fontcolor={color_white}@1:
+                alpha='{alpha}':
+                x={x}+78:
+                y={y}+{delta_h}*2 + 8
+            " 
+            -c:a copy
+            {output_final_prefix}tl2_dates2.mp4
+    
+    # # Step 7: Genearte the final one and clean
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: cp -f {output_final_prefix}tl2_dates3.mp4  {output_final}
+    - COMMAND: cp -f {output_final_prefix}tl2_dates2.mp4  {output_final}
     - COMMAND: rm -f video_init_*.mp4 --continue --if {del}
     - COMMAND: rm -f video_final_*.mp4 --continue --if {del}
     - COMMAND: rm d_filelist.txt --continue --if {del}

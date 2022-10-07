@@ -10,7 +10,7 @@ if len(sys.argv) >= 2:
 #today = datetime.date.today().strftime('%Y-%m-%d')
 today = datetime.date.today()
 day = sxtwl.fromSolar(today.year, today.month, today.day)
-#day = sxtwl.fromSolar(2022, 10, 8)
+#day = sxtwl.fromSolar(2022, 10, 22)
  
 ## 一些常量文字的定义。
 jqmc = ["冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"]
@@ -29,7 +29,7 @@ dayOfWeek = WeekCn[day.getWeek()]
 print(dayOfWeek)
 
 # 星座
-xingZuo = XiZ[day.getConstellation()]
+xingZuo = XiZ[day.getConstellation()] + '座'
 print("星座:", xingZuo)
 
 # 农历
@@ -41,7 +41,7 @@ print(nongli)
 yTG = day.getYearGZ(True)
 yTG_DG = Gan[yTG.tg] + Zhi[yTG.dz]
 print(yTG_DG) 
-shengXiao = ShX[yTG.dz]
+shengXiao = Zhi[yTG.dz] + ShX[yTG.dz]
 print(shengXiao)
 
 # 当日是否有节气
