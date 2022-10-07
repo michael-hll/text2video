@@ -99,7 +99,7 @@ for filename in os.listdir(default_dir):
     # replace the target file with default background    
     if(os.path.exists(target_f)):
         os.remove(target_f)   
-    shutil.move(default_f, target_f)
+    shutil.copy(default_f, target_f)
     j += 1
  
   

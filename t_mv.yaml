@@ -21,6 +21,7 @@ Variables:
     color_blue: '#3396F0'
     color_pink: '#F02A6C'
     color_yellow: '#FFEC1D'
+    color_red: 'red'
 Tube:
     # step 1: Get 'video_init.mp4' and backgournd pictures
     - PATH: {downloads}
@@ -47,6 +48,8 @@ Tube:
     # remove backgound pictures  
     - PATH: '{text2video_root}/tmp'
     - COMMAND: rm bg*.jpg --continue --if {dpics} {del}
+    - PATH: '{text2video_root}/tmp/default-bg'
+    - COMMAND: rm *.* --continue --if {dpics} {del}
     - PATH: {text2video_root}
     # get background pictures
     - GET_FILE_KEY_VALUE: -f t_apikeys.yaml
@@ -150,7 +153,7 @@ Tube:
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{xingqi}':
                 fontsize={font_size}:
-                fontcolor={color_blue}@1:
+                fontcolor={color_red}@1:
                 alpha='{alpha}':
                 x={x} + 415:
                 y={y}+{delta_h}*2 - 25,
