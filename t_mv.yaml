@@ -11,6 +11,8 @@ Variables:
     # settings for dynamic drawing text
     video_duration:
     start: 6
+    start2: 16
+    start3: 26
     duration: 5
     text: TEXT
     font_size: 55
@@ -29,6 +31,8 @@ Tube:
     - COMMAND: rm *.ass --continue --if {del}
     - PATH: {text2video_root}
     - GET_FILE_KEY_VALUE: -f ./t_article.yaml --override
+    - SET_VARIABLE: -n date -v "{date}".replace(":","\\:")
+    - SET_VARIABLE: -n source -v "{source}".replace(":","\\:")
     - COMMAND: python3 s_t2v.py ./t_article.yaml --if {t2v}    
     # Wating the video download to be finished
     - RUN_TUBE: -y t_wv.yaml -w {downloaded} == no --if {t2v}
@@ -47,9 +51,7 @@ Tube:
     - COMMAND: cp -f '{downloads}/{cname}' {text2video_root}/tmp/subtitle.ass  --if {t2v}
     # remove backgound pictures  
     - PATH: '{text2video_root}/tmp'
-    - COMMAND: rm bg*.jpg --continue --if {dpics} {del}
-    - PATH: '{text2video_root}/tmp/default-bg'
-    - COMMAND: rm *.* --continue --if {dpics} {del}
+    - COMMAND: rm bg*.jpg --continue --if {dpics} {del}    
     - PATH: {text2video_root}
     # get background pictures
     - GET_FILE_KEY_VALUE: -f t_apikeys.yaml
@@ -69,6 +71,8 @@ Tube:
     # # and output combined video: video_final_draft.mp4
     - PATH: {text2video_root}
     - COMMAND: python3 s_pv.py ./tmp
+    - PATH: '{text2video_root}/tmp/default-bg'
+    - COMMAND: rm *.* --continue --if {dpics} {del}
 
     # # step 4: Add title, captions, weathers
     - PATH: {text2video_root}
@@ -116,11 +120,11 @@ Tube:
     - COMMAND: >
         ffmpeg -y {video_duration} -i {output_final_prefix}tcwl.mp4 -filter_complex "
             drawbox=x={x}-10:y=1080/3*2-8:color=black@0.38:
-                width=600:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+2)',
+                width=600:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+1)',
             drawbox=x={x}-10:y=1080/3*2-8:color={color_white}@1:
-                width=600:height=170:t=1:enable='between(t,{start},{start}+2+{duration}+2)',
+                width=600:height=170:t=1:enable='between(t,{start},{start}+2+{duration}+1)',
             drawbox=x={x}+410:y=1080/3*2-8:color={color_white}@0.5:
-                width=1:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+2)'
+                width=1:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+1)'
         "        
         -c:a copy
         {output_final_prefix}tl2_dates.mp4
@@ -132,6 +136,22 @@ Tube:
                 if(lt(t,{start}+2),(t-{start})/2,
                     if(lt(t,{start}+2+{duration}),1,
                         if(lt(t,{start}+2+{duration}+2),(2-(t-({start}+2+{duration})))/2,
+                            0))))
+    - SET_VARIABLE: >
+        -n alpha2
+        -v 
+            if(lt(t,{start2}),0,
+                if(lt(t,{start2}+2),(t-{start2})/2,
+                    if(lt(t,{start2}+2+{duration}),1,
+                        if(lt(t,{start2}+2+{duration}+2),(2-(t-({start2}+2+{duration})))/2,
+                            0))))
+    - SET_VARIABLE: >
+        -n alpha3
+        -v 
+            if(lt(t,{start3}),0,
+                if(lt(t,{start3}+2),(t-{start3})/2,
+                    if(lt(t,{start3}+2+{duration}),1,
+                        if(lt(t,{start3}+2+{duration}+2),(2-(t-({start3}+2+{duration})))/2,
                             0))))
     # begin to draw Gongli, Nongli, Xingqi, TianGan, Dizhi    
     - COMMAND: >
@@ -184,6 +204,20 @@ Tube:
                 fontcolor={color_white}@1:
                 alpha='{alpha}':
                 x={x}+78:
+                y={y}+{delta_h}*2 + 8,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='新闻日期\: {date}':
+                fontsize={font_size}-18:
+                fontcolor={color_white}@1:
+                alpha='{alpha2}':
+                x={x}+15:
+                y={y}+{delta_h}*2 + 8,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{source}':
+                fontsize={font_size}-18:
+                fontcolor={color_white}@1:
+                alpha='{alpha3}':
+                x={x}+15:
                 y={y}+{delta_h}*2 + 8
             " 
             -c:a copy
