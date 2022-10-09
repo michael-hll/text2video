@@ -10,6 +10,7 @@ Variables:
     start: 6 # dates
     start2: 16 # news_dates
     start3: 26 # news source
+    start4: 36 # editor
     duration: 5
     text: TEXT
     font_size: 55
@@ -140,6 +141,7 @@ Tube:
     - SET_VARIABLE: -n news_date -v 发稿日期： {news_date} --if {news_date} != ''
     - SET_VARIABLE: -n news_date -v "{news_date}".replace(":","\\:") --if {news_date} != ''
     - SET_VARIABLE: -n source -v "{source}".replace(":","\\:")
+    - SET_VARIABLE: -n author -v "{author}".replace(":","\\:")
     - SET_VARIABLE: -n start3 -v 16 --if {news_date} == ''
     - SET_VARIABLE: -n start3 -v 26 --if {news_date} != ''
     - SET_VARIABLE: >
@@ -157,6 +159,14 @@ Tube:
                 if(lt(t,{start3}+2),(t-{start3})/2,
                     if(lt(t,{start3}+2+{duration}),1,
                         if(lt(t,{start3}+2+{duration}+2),(2-(t-({start3}+2+{duration})))/2,
+                            0))))
+    - SET_VARIABLE: >
+        -n alpha4
+        -v 
+            if(lt(t,{start4}),0,
+                if(lt(t,{start4}+2),(t-{start4})/2,
+                    if(lt(t,{start4}+2+{duration}),1,
+                        if(lt(t,{start4}+2+{duration}+2),(2-(t-({start4}+2+{duration})))/2,
                             0))))
     
     # decide the color of dayOfWeek
@@ -228,6 +238,13 @@ Tube:
                 fontsize={font_size}-15:
                 fontcolor={color_white}@1:
                 alpha='{alpha3}':
+                x={x}+15:
+                y={y}+{delta_h}*2 + 20,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{author}':
+                fontsize={font_size}-15:
+                fontcolor={color_white}@1:
+                alpha='{alpha4}':
                 x={x}+15:
                 y={y}+{delta_h}*2 + 20
             " 
