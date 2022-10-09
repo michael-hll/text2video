@@ -1,0 +1,33 @@
+# take 1 frame at a given time
+ffmpeg -ss 5 -i input.mp4 -frames:v 1 out.png
+
+# how to use one picture to build one video for 10 seconds
+ffmpeg -y -loop 1 -i bg00.jpg -c:v libx264 -t 10 -pix_fmt yuv420p -vf scale=1920:1080 out.mp4
+
+# how to dynamic show an image over a video
+ffmpeg -y -i out1.mp4 -loop 1 -i bg01.jpg -filter_complex "
+            [1:v]scale=1920:1080,crop=w=in_w:h='50t':x=0:y=0[v1];
+            [0:v][v1]overlay=0:0:shortest=1[out]
+            "
+        -map "[out]"  out3.mp4
+
+# how to use min method to scale an image
+ffmpeg -i bg00.jpg -filter:v "scale='min(1920,iw)':'min(1080,ih)'" out.jpg  
+
+# scale (decrease) and pad
+ffmpeg -i bg00.jpg -filter:v "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1:color=black" out.jpg
+
+# scale (increase) and crop
+ffmpeg -i bg00.jpg -filter:v "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080" out.jpg
+
+# scale increase neighbor
+ffmpeg -i bg00.jpg -filter:v scale=-1:1080 -sws_flags neighbor out.jpg
+
+# corp first and scale to bigger one 
+ffmpeg -y -i bg99.png -filter_complex "[0]crop=1080/2:1920/2[p1];[p1]scale=-1:1920[out]" -map "[out]" out.png
+
+# video to images
+ffmpeg -i out.mp4 ./pics/img%03d.jpg
+
+# crop sequences of images 
+# ffmpeg -y -i ./pics/img%03d.jpg -filter:v "crop=iw:ih/10,pad=1920:1080" ./pics/img%03d_o.jpg
