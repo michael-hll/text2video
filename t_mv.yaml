@@ -4,15 +4,12 @@ Variables:
     output_final_draft: 'video_final_draft.mp4'
     output_final: 'video_final.mp4'
     output_final_prefix: 'video_final_'
-    downloaded: no
-    t2v: yes # If re-generate the 'video_init.mp4'   
-    dpics: yes
-    del: yes 
+    downloaded: no    
     # settings for dynamic drawing text
     video_duration:
-    start: 6
-    start2: 16
-    start3: 26
+    start: 6 # dates
+    start2: 16 # news_dates
+    start3: 26 # news source
     duration: 5
     text: TEXT
     font_size: 55
@@ -24,6 +21,10 @@ Variables:
     color_pink: '#F02A6C'
     color_yellow: '#FFEC1D'
     color_red: 'red'
+    # input parameters
+    t2v: yes # If re-generate the 'video_init.mp4'   
+    dpics: yes # if download pictures
+    del: yes # if delete temp files
 Tube:
     # step 1: Get 'video_init.mp4' and backgournd pictures
     - PATH: {downloads}
@@ -31,11 +32,9 @@ Tube:
     - COMMAND: rm *.ass --continue --if {del}
     - PATH: {text2video_root}
     - GET_FILE_KEY_VALUE: -f ./t_article.yaml --override
-    - SET_VARIABLE: -n date -v "{date}".replace(":","\\:")
-    - SET_VARIABLE: -n source -v "{source}".replace(":","\\:")
     - COMMAND: python3 s_t2v.py ./t_article.yaml --if {t2v}    
     # Wating the video download to be finished
-    - RUN_TUBE: -y t_wv.yaml -w {downloaded} == no --if {t2v}
+    - RUN_TUBE: -t t_wv.yaml -w {downloaded} == no --if {t2v}
     - PATH: {downloads}
     # get video download file name
     - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{print "vname="$NF}' > video_init_name.txt --if {t2v}
@@ -120,11 +119,11 @@ Tube:
     - COMMAND: >
         ffmpeg -y {video_duration} -i {output_final_prefix}tcwl.mp4 -filter_complex "
             drawbox=x={x}-10:y=1080/3*2-8:color=black@0.38:
-                width=600:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+1)',
+                width=600:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+2)',
             drawbox=x={x}-10:y=1080/3*2-8:color={color_white}@1:
-                width=600:height=170:t=1:enable='between(t,{start},{start}+2+{duration}+1)',
+                width=600:height=170:t=1:enable='between(t,{start},{start}+2+{duration}+2)',
             drawbox=x={x}+410:y=1080/3*2-8:color={color_white}@0.5:
-                width=1:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+1)'
+                width=1:height=170:t=fill:enable='between(t,{start},{start}+2+{duration}+2)'
         "        
         -c:a copy
         {output_final_prefix}tl2_dates.mp4
@@ -137,6 +136,11 @@ Tube:
                     if(lt(t,{start}+2+{duration}),1,
                         if(lt(t,{start}+2+{duration}+2),(2-(t-({start}+2+{duration})))/2,
                             0))))
+    - SET_VARIABLE: -n news_date -v 发稿日期： {news_date} --if {news_date} != ''
+    - SET_VARIABLE: -n news_date -v "{news_date}".replace(":","\\:") --if {news_date} != ''
+    - SET_VARIABLE: -n source -v "{source}".replace(":","\\:")
+    - SET_VARIABLE: -n start3 -v 16 --if {news_date} == ''
+    - SET_VARIABLE: -n start3 -v 26 --if {news_date} != ''
     - SET_VARIABLE: >
         -n alpha2
         -v 
@@ -206,7 +210,7 @@ Tube:
                 x={x}+78:
                 y={y}+{delta_h}*2 + 8,
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
-                text='新闻日期\: {date}':
+                text='{news_date}':
                 fontsize={font_size}-18:
                 fontcolor={color_white}@1:
                 alpha='{alpha2}':
