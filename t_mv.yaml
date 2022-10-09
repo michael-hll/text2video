@@ -20,7 +20,8 @@ Variables:
     color_blue: '#3396F0'
     color_pink: '#F02A6C'
     color_yellow: '#FFEC1D'
-    color_red: 'red'
+    color_red: red
+    color_green: green
     # input parameters
     t2v: yes # If re-generate the 'video_init.mp4'   
     dpics: yes # if download pictures
@@ -127,7 +128,7 @@ Tube:
         "        
         -c:a copy
         {output_final_prefix}tl2_dates.mp4
-    # set text alpha value    
+    # set text alpha/start value    
     - SET_VARIABLE: >
         -n alpha
         -v 
@@ -157,6 +158,12 @@ Tube:
                     if(lt(t,{start3}+2+{duration}),1,
                         if(lt(t,{start3}+2+{duration}+2),(2-(t-({start3}+2+{duration})))/2,
                             0))))
+    
+    # decide the color of dayOfWeek
+    - SET_VARIABLE: -n dayOfWeek -v datetime.today().weekday()
+    - SET_VARIABLE: -n color_day -v green --if {dayOfWeek} < 5
+    - SET_VARIABLE: -n color_day -v red --if {dayOfWeek} > 4
+    
     # begin to draw Gongli, Nongli, Xingqi, TianGan, Dizhi    
     - COMMAND: >
         ffmpeg -y {video_duration} -i {output_final_prefix}tl2_dates.mp4 -filter_complex "
@@ -177,7 +184,7 @@ Tube:
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{xingqi}':
                 fontsize={font_size}:
-                fontcolor={color_red}@1:
+                fontcolor={color_day}@1:
                 alpha='{alpha}':
                 x={x} + 415:
                 y={y}+{delta_h}*2 - 25,
@@ -211,18 +218,18 @@ Tube:
                 y={y}+{delta_h}*2 + 8,
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{news_date}':
-                fontsize={font_size}-18:
+                fontsize={font_size}-15:
                 fontcolor={color_white}@1:
                 alpha='{alpha2}':
                 x={x}+15:
-                y={y}+{delta_h}*2 + 8,
+                y={y}+{delta_h}*2 + 20,
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{source}':
-                fontsize={font_size}-18:
+                fontsize={font_size}-15:
                 fontcolor={color_white}@1:
                 alpha='{alpha3}':
                 x={x}+15:
-                y={y}+{delta_h}*2 + 8
+                y={y}+{delta_h}*2 + 20
             " 
             -c:a copy
             {output_final_prefix}tl2_dates2.mp4
