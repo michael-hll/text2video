@@ -13,3 +13,5 @@ d_reporter.txt
 s_test.py
 d_weathers.txt
 d_date_detail.txt
+all_pics.txt
+*.backup
