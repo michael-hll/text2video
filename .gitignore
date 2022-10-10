@@ -15,3 +15,4 @@ d_weathers.txt
 d_date_detail.txt
 all_pics.txt
 *.backup
+*.yaml.log
