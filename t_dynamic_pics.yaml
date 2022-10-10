@@ -1,55 +1,94 @@
 Variables:
     text2video_root: /volumes/macdrive/projects/text2video
     input:
-    h:
-Tube:
+    output:
+    curr_line:
+    font_size: 100
+    font_color: yellow
+    text_left: 40
+    text_top: 40
+TUBE:
+    # adjust background dimension to 1080:1920
+    - COMMAND: ffmpeg -y -i tmp/dpics/bg.png -filter:v "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" tmp/dpics/bg_hd.png
+    # write news to picture background
+    - RUN_TUBE: -t WriteText    
+    # picture to video
+    - COMMAND: ffmpeg -y -loop 1 -i {output} -c:v libx264 -t 10 -pix_fmt yuv420p tmp/dpics/bg_video.mp4
+    # video to images
+    - COMMAND: rm tmp/dpics/*.jpg --continue
+    - COMMAND: ffmpeg -y -i tmp/dpics/bg_video.mp4 ./tmp/dpics/img%03d.jpg
+    # Output new video
+    - RUN_TUBE: -t PicsToVideo
+    - COMMAND: rm tmp/dpics/*.jpg --continue
+
+WriteText:
+    # write news content to background
+    - COUNT: -f tmp/dpics/news.txt -v news_count
+    - SET_VARIABLE: -n curr_line -v 0
+    - SET_VARIABLE: -n fontHeight -v 50
+    - SET_VARIABLE: -n input -v tmp/dpics/bg_hd.png
+    - RUN_TUBE: -t WriteLine -w {curr_line} < {news_count}
+WriteLine:
+    - SET_VARIABLE: -n input -v {output} --if {output} != ''
+    - SET_VARIABLE: -n curr_line -v {curr_line} + 1    
+    - READ_LINE_IN_FILE: -f tmp/dpics/news.txt -n {curr_line} -v line    
+    - COMMAND: >
+        ffmpeg -y -i {input} -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+                text='{line}':fontcolor={font_color}:
+                fontsize={font_size}:
+                x={text_left}:
+                y={fontHeight}" 
+            tmp/dpics/bg_hd{curr_line}.png
+    - SET_VARIABLE:  -n output -v tmp/dpics/bg_hd{curr_line}.png           
+    - SET_VARIABLE: -n fontHeight -v {fontHeight} + {font_size}
+
+PicsToVideo:
     - PATH: '{text2video_root}'
-    - COMMAND: rm tmp/pics/*_o*.jpg --continue
-    - LIST_FILES: -d tmp/pics/*.jpg -r tmp/all_pics.txt -s name
-    - SET_VARIABLE: -n h -v 0
-    - RUN_TUBE: -t CROP -w {h} < 250
-    - COMMAND: ffmpeg -y -r 25 -i tmp/pics/img%03d_o.jpg out_pics.mp4
-    - COMMAND: ffplay out_pics.mp4
+    - LIST_FILES: -d tmp/dpics/*.jpg -r tmp/dpics/all_pics.txt -s name
+    - SET_VARIABLE: -n curr_line -v 0
+    - RUN_TUBE: -t CROP -w {curr_line} < 250
+    - COMMAND: ffmpeg -y -r 25 -i tmp/dpics/img%03d_o.jpg pics_video.mp4
+    - COMMAND: ffplay pics_video.mp4
 CROP:
-    - SET_VARIABLE: -n h -v {h} + 1
-    - READ_LINE_IN_FILE: -f all_pics.txt -n {h} -v input
-    - SET_VARIABLE: -n input -v "{input}".replace(".jpg","") --if {input} != ''
-    - COMMAND: ffmpeg -y -i {input}.jpg -filter:v "crop=iw:(1080/250)*{h}:0:0,pad=1920:1080" {input}_o.jpg --if {input} != ''
-    
+    - SET_VARIABLE: -n curr_line -v {curr_line} + 1
+    - READ_LINE_IN_FILE: -f tmp/dpics/all_pics.txt -n {curr_line} -v line
+    - SET_VARIABLE: -n line -v "{line}".replace(".jpg","") --if {line} != ''
+    - COMMAND: ffmpeg -y -i {line}.jpg -filter:v "crop=iw:(1920/250)*{curr_line}:0:0,pad=1080:1920" {line}_o.jpg --if {line} != ''
 
-# # take 1 frame at a given time
-# ffmpeg -ss 5 -i input.mp4 -frames:v 1 out.png
+Notes: >
+    # take 1 frame at a given time
+    ffmpeg -ss 5 -i input.mp4 -frames:v 1 out.png
 
-# # how to use one picture to build one video for 10 seconds
-# ffmpeg -y -loop 1 -i bg00.jpg -c:v libx264 -t 10 -pix_fmt yuv420p -vf scale=1920:1080 out.mp4
+    # how to use one picture to build one video for 10 seconds
+    ffmpeg -y -loop 1 -i bg00.jpg -c:v libx264 -t 10 -pix_fmt yuv420p -vf scale=1920:1080 out.mp4
 
-# # how to dynamic show an image over a video
-# ffmpeg -y -i out1.mp4 -loop 1 -i bg01.jpg -filter_complex "
-#             [1:v]scale=1920:1080,crop=w=in_w:h='50t':x=0:y=0[v1];
-#             [0:v][v1]overlay=0:0:shortest=1[out]
-#             "
-#         -map "[out]"  out3.mp4
+    # how to dynamic show an image over a video
+    ffmpeg -y -i out1.mp4 -loop 1 -i bg01.jpg -filter_complex "
+                [1:v]scale=1920:1080,crop=w=in_w:h='50t':x=0:y=0[v1];
+                [0:v][v1]overlay=0:0:shortest=1[out]
+                "
+            -map "[out]"  out3.mp4
 
-# # how to use min method to scale an image
-# ffmpeg -i bg00.jpg -filter:v "scale='min(1920,iw)':'min(1080,ih)'" out.jpg  
+    # how to use min method to scale an image
+    ffmpeg -i bg00.jpg -filter:v "scale='min(1920,iw)':'min(1080,ih)'" out.jpg  
 
-# # scale (decrease) and pad
-# ffmpeg -i bg00.jpg -filter:v "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1:color=black" out.jpg
+    # scale (decrease) and pad
+    ffmpeg -i bg00.jpg -filter:v "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1:color=black" out.jpg
 
-# # scale (increase) and crop
-# ffmpeg -i bg00.jpg -filter:v "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080" out.jpg
+    # scale (increase) and crop
+    ffmpeg -i bg00.jpg -filter:v "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080" out.jpg
 
-# # scale increase neighbor
-# ffmpeg -i bg00.jpg -filter:v scale=-1:1080 -sws_flags neighbor out.jpg
+    # scale increase neighbor
+    ffmpeg -i bg00.jpg -filter:v scale=-1:1080 -sws_flags neighbor out.jpg
 
-# # corp first and scale to bigger one 
-# ffmpeg -y -i bg99.png -filter_complex "[0]crop=1080/2:1920/2[p1];[p1]scale=-1:1920[out]" -map "[out]" out.png
+    # corp first and scale to bigger one 
+    ffmpeg -y -i bg99.png -filter_complex "[0]crop=1080/2:1920/2[p1];[p1]scale=-1:1920[out]" -map "[out]" out.png
 
-# # video to images
-# ffmpeg -i out.mp4 ./pics/img%03d.jpg
+    # video to images
+    ffmpeg -i out.mp4 ./pics/img%03d.jpg
 
-# # crop sequences of images 
-# # ffmpeg -y -i ./pics/img%03d.jpg -filter:v "crop=iw:ih/10,pad=1920:1080" ./pics/img%03d_o.jpg
+    # crop sequences of images 
+    ffmpeg -y -i ./pics/img%03d.jpg -filter:v "crop=iw:ih/10,pad=1920:1080" ./pics/img%03d_o.jpg
 
 
 
