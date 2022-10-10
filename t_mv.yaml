@@ -1,12 +1,14 @@
 Variables:
+    # debugging used
+    video_duration:
+    # folders and names
     text2video_root: /volumes/macdrive/projects/text2video
     downloads: /Users/lianglianghan/downloads
     output_final_draft: 'video_final_draft.mp4'
     output_final: 'video_final.mp4'
     output_final_prefix: 'video_final_'
-    downloaded: no    
-    # settings for dynamic drawing text
-    video_duration:
+    downloaded: no        
+    # settings for dynamic drawing text    
     start: 6 # dates
     start2: 16 # news_dates
     start3: 26 # news source
@@ -23,6 +25,7 @@ Variables:
     color_yellow: '#FFEC1D'
     color_red: red
     color_green: green
+    color_black: black
     # input parameters
     t2v: yes # If re-generate the 'video_init.mp4'   
     dpics: yes # if download pictures
@@ -81,7 +84,7 @@ Tube:
     - GET_FILE_KEY_VALUE: -f d_weathers.txt
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
-        ffmpeg -y -i {output_final_draft} -filter_complex "
+        ffmpeg -y {video_duration} -i {output_final_draft} -filter_complex "
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{title}':
                 fontcolor=yellow:fontsize=125:enable='between(t,0,5)':
                 box=1:boxcolor=black@0.6:boxborderw=5:x=(w-text_w)/2:y=(h/2):expansion=none,
@@ -102,7 +105,7 @@ Tube:
     # # Step 5: Add logo
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
-        ffmpeg -y -i {output_final_prefix}tcw.mp4 -i cnBeta.png -i Rnews.jpg
+        ffmpeg -y {video_duration} -i {output_final_prefix}tcw.mp4 -i cnBeta.png -i Rnews.jpg
         -filter_complex "
             [1:v]colorkey=0xffffff:0.3:0.2[ckout1];
             [2:v]colorkey=0x00ff00:0.3:0.2[ckout2];
@@ -226,6 +229,8 @@ Tube:
                 alpha='{alpha}':
                 x={x}+78:
                 y={y}+{delta_h}*2 + 8,
+            drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.1:
+                width=650:height=50:t=fill:enable='between(t,{start2},{start2}+2+{duration}+2)',
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{news_date}':
                 fontsize={font_size}-15:
@@ -233,6 +238,8 @@ Tube:
                 alpha='{alpha2}':
                 x={x}+15:
                 y={y}+{delta_h}*2 + 20,
+            drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.1:
+                width=380:height=50:t=fill:enable='between(t,{start3},{start3}+2+{duration}+2)',
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{source}':
                 fontsize={font_size}-15:
@@ -240,6 +247,8 @@ Tube:
                 alpha='{alpha3}':
                 x={x}+15:
                 y={y}+{delta_h}*2 + 20,
+            drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.1:
+                width=380:height=50:t=fill:enable='between(t,{start4},{start4}+2+{duration}+2)',
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{author}':
                 fontsize={font_size}-15:
