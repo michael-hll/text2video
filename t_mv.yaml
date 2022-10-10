@@ -80,7 +80,7 @@ Tube:
 
     # # step 4: Add title, captions, weathers
     - PATH: {text2video_root}
-    - COMMAND: python3 s_weathers.py {HEFENG_API_KEY} 'changchun,sanya,xian,chongqing,shenzhen,shanghai,beijing' d_weathers.txt
+    - COMMAND: python3 s_weathers.py {HEFENG_API_KEY} 'shenzhen,shanghai,beijing' d_weathers.txt 12
     - GET_FILE_KEY_VALUE: -f d_weathers.txt
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
@@ -97,7 +97,7 @@ Tube:
                fontcolor=yellow:
                fontsize=50:
                text='{weathers}':
-               x=mod(150*t\,w+tw)-tw:y=1:
+               x=mod(200*t\,w+tw)-tw:y=1:
                box=1:boxcolor=black@0.8
         "
         -codec:a copy -y {output_final_prefix}tcw.mp4

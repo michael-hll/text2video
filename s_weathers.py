@@ -2,17 +2,22 @@ import requests
 from datetime import datetime
 import locale
 import sys
+import random
 
 '''
     args:
         api_key: str # hefeng api key
-        cities: str  # comma seperated city/location list
+        cities: str  # comma seperated city/location list        
         file: str    # save result to file
+        count: int   # how many cities you want to show (1~30)
 '''
 
 hf_api_key = '<API KEY>'
-cities = '北京,上海,深圳,三亚,重庆,西安,长春'
+cities = '北京,上海,深圳'
+cities2 = '重庆,长春,呼和浩特,乌鲁木齐,西宁,银川,济南,合肥,武汉,成都,昆明,拉萨,南昌,福州,海口,澳门,天津,哈尔滨,沈阳,石家庄,兰州,西安,郑州,太原,长沙,南京,贵阳,南宁,杭州,广州,台北,香港'
+
 weather_file = 'd_weathers.txt'
+city_count = 10
 
 argv_count = len(sys.argv)
 
@@ -121,13 +126,22 @@ if __name__ == '__main__':
             cities = sys.argv[2]
         if argv_count >= 4:
             weather_file = sys.argv[3]
+        if argv_count >= 5:
+            city_count = int(sys.argv[4])
         
         # get weather by location list
         weather = HefengWeather()    
-        citiy_list = cities.split(',')
+        city_list = cities.split(',')
+        whole_list = random.sample(cities2.split(','),city_count)
+        others_set = set()
+        for city in whole_list:
+            others_set.add(city)
+        whole_list = list(others_set)
+        whole_list.extend(city_list)
+        print(whole_list)
         locale.setlocale(locale.LC_TIME, "zh_CN")
         out = ''
-        for city in citiy_list:
+        for city in whole_list:
             try:
                 city_detail = weather.get_location_info(city)
                 w_detail = weather.get_weather_by_location_id(city_detail['id'])
