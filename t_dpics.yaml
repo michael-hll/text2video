@@ -8,6 +8,7 @@ Variables:
     text_left: 40
     text_top: 40
 TUBE:
+    - PATH: {text2video_root}
     # adjust background dimension to 1080:1920
     - COMMAND: ffmpeg -y -i tmp/dpics/bg.png -filter:v "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" tmp/dpics/bg_hd.png
     # write news to picture background
@@ -18,7 +19,7 @@ TUBE:
     - COMMAND: rm tmp/dpics/*.jpg --continue
     - COMMAND: ffmpeg -y -i tmp/dpics/bg_video.mp4 ./tmp/dpics/img%03d.jpg
     # Output new video
-    - RUN_TUBE: -t PicsToVideo
+    - RUN_TUBE: -t CropPicsToVideo
     - COMMAND: rm tmp/dpics/*.jpg --continue
 
 WriteText:
@@ -42,7 +43,7 @@ WriteLine:
     - SET_VARIABLE:  -n output -v tmp/dpics/bg_hd{curr_line}.png           
     - SET_VARIABLE: -n fontHeight -v {fontHeight} + {font_size}
 
-PicsToVideo:
+CropPicsToVideo:
     - PATH: '{text2video_root}'
     - LIST_FILES: -d tmp/dpics/*.jpg -r tmp/dpics/all_pics.txt -s name
     - SET_VARIABLE: -n curr_line -v 0
