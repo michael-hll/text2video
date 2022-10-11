@@ -57,13 +57,13 @@ GenNewsText:
 WriteText:
     # write news content to background
     - COUNT: -f tmp/dpics/news.txt -v news_count
-    - SET_VARIABLE: -n curr_line -v 0
-    - SET_VARIABLE: -n fontHeight -v 50
-    - SET_VARIABLE: -n input -v tmp/dpics/bg_hd.png
+    - SET_VARIABLE: -n curr_line -v 0 -g
+    - SET_VARIABLE: -n fontHeight -v 50 -g
+    - SET_VARIABLE: -n input -v tmp/dpics/bg_hd.png -g
     - RUN_TUBE: -t WriteLine -w {curr_line} < {news_count}
 WriteLine:
-    - SET_VARIABLE: -n input -v {output} --if {output} != ''
-    - SET_VARIABLE: -n curr_line -v {curr_line} + 1    
+    - SET_VARIABLE: -n input -v {output} --if {output} != '' -g
+    - SET_VARIABLE: -n curr_line -v {curr_line} + 1 -g
     - READ_LINE_IN_FILE: -f tmp/dpics/news.txt -n {curr_line} -v line    
     - COMMAND: >
         ffmpeg -y -i {input} -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
@@ -72,19 +72,19 @@ WriteLine:
                 x=(w-tw)/2:
                 y={fontHeight}" 
             tmp/dpics/bg_news_hd{curr_line}.png
-    - SET_VARIABLE:  -n output -v tmp/dpics/bg_news_hd{curr_line}.png           
-    - SET_VARIABLE: -n fontHeight -v {fontHeight} + {font_size}
+    - SET_VARIABLE:  -n output -v tmp/dpics/bg_news_hd{curr_line}.png -g      
+    - SET_VARIABLE: -n fontHeight -v {fontHeight} + {font_size} -g
 
 CropPicsToVideo:
     - PATH: '{text2video_root}'
     - LIST_FILES: -d tmp/dpics/*.jpg -r tmp/dpics/all_pics.txt -s name
-    - SET_VARIABLE: -n curr_line -v 0
+    - SET_VARIABLE: -n curr_line -v 0 -g
     - RUN_TUBE: -t CROP -w {curr_line} < 250
     - COMMAND: ffmpeg -y -r 25 -i tmp/dpics/img%03d_o.jpg tmp/dpics/pics_video.mp4
 CROP:
-    - SET_VARIABLE: -n curr_line -v {curr_line} + 1
+    - SET_VARIABLE: -n curr_line -v {curr_line} + 1 -g
     - READ_LINE_IN_FILE: -f tmp/dpics/all_pics.txt -n {curr_line} -v line
-    - SET_VARIABLE: -n line -v "{line}".replace(".jpg","") --if {line} != ''
+    - SET_VARIABLE: -n line -v "{line}".replace(".jpg","") --if {line} != '' -g
     - COMMAND: ffmpeg -y -i {line}.jpg -filter:v "crop=iw:(1920/250)*{curr_line}:0:0,pad=1080:1920" {line}_o.jpg --if {line} != ''
 
 Notes: >
