@@ -36,10 +36,10 @@ Tube:
     - COMMAND: rm 未命名*.mp4 --continue --if {del}
     - COMMAND: rm *.ass --continue --if {del}
     - PATH: {text2video_root}
-    - GET_FILE_KEY_VALUE: -f ./t_article.yaml --override
-    - COMMAND: python3 s_t2v.py ./t_article.yaml --if {t2v}    
+    - GET_FILE_KEY_VALUE: -f ./t_article.yaml -g
+    - COMMAND: python3 s_t2v.py ./t_article.yaml --if {t2v}
     # Wating the video download to be finished
-    - RUN_TUBE: -t t_wv.yaml -w {downloaded} == no --if {t2v}
+    - RUN_TUBE: -t WaitngDownload -w {downloaded} == no --if {t2v}
     - PATH: {downloads}
     # get video download file name
     - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{print "vname="$NF}' > video_init_name.txt --if {t2v}
@@ -47,8 +47,8 @@ Tube:
     - COMMAND: ls -tr ./*.ass | tail -1 | awk -F '/' '{print "cname="$NF}' > caption_init_name.txt --if {t2v}
     - PAUSE: 0.05
     # load video name and caption init name to variables
-    - GET_FILE_KEY_VALUE: -f video_init_name.txt --if {t2v}
-    - GET_FILE_KEY_VALUE: -f caption_init_name.txt --if {t2v}
+    - GET_FILE_KEY_VALUE: -f video_init_name.txt --if {t2v} -g
+    - GET_FILE_KEY_VALUE: -f caption_init_name.txt --if {t2v} -g
     - PATH: {text2video_root}
     - COMMAND: mkdir -p ./tmp
     - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4  --if {t2v}
@@ -58,7 +58,7 @@ Tube:
     - COMMAND: rm bg*.jpg --continue --if {dpics} {del}    
     - PATH: {text2video_root}
     # get background pictures
-    - GET_FILE_KEY_VALUE: -f t_apikeys.yaml
+    - GET_FILE_KEY_VALUE: -f t_apikeys.yaml -g
     - COMMAND: python3 s_downpics.py ./t_apikeys.yaml '{keywords}' 20 ./tmp --if {dpics}
     
     # # step 2: Split init video into pieces
@@ -267,3 +267,9 @@ Tube:
     - COMMAND: rm -f video_final_*.mp4 --continue --if {del}
     - COMMAND: rm d_filelist.txt --continue --if {del}
     - COMMAND: ffplay {output_final}
+
+WaitngDownload:
+    - PATH: {downloads}
+    - FILE_EXIST: -f 未命名*.mp4 -v downloaded -g
+    - FILE_EXIST: -f 未命名*.ass -v downloaded -g
+    - PAUSE: 0.05    

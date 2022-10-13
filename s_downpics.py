@@ -2,6 +2,7 @@ from pypexels import PyPexels
 from s_utility import Utility
 import requests, sys, os
 import shutil
+import time
 
 def __pexels_api_description():
     #GET https://api.pexels.com/v1/search
@@ -42,7 +43,7 @@ Description: Download pictures from Pexels api
 '''
 
 key_file = './t_apikeys.yaml'
-keywords = 'pexels'
+keywords = '英雄联盟 match scout CNMO League of Legends'
 count = 15
 out_dir = './tmp'
 pic_name = 'bg{:02d}.jpg'
@@ -82,6 +83,9 @@ default_dir = out_dir + '/default-bg'
 j = 0
 for filename in os.listdir(default_dir):
     
+    if not filename.endswith('png'):
+        continue
+    
     # get the default pic file name
     default_f = os.path.join(default_dir, filename)    
     
@@ -98,7 +102,7 @@ for filename in os.listdir(default_dir):
     
     # replace the target file with default background    
     if(os.path.exists(target_f)):
-        os.remove(target_f)   
+        os.remove(target_f)  
     shutil.copy(default_f, target_f)
     j += 1
  
