@@ -39,7 +39,8 @@ if __name__ == '__main__':
         result = ''
         for i, article in enumerate(articles):
             title = article['title'].replace('Sina', '新浪').replace('- VOA Mandarin', '').replace('- People', '').replace('','')
+            url = article['url']
             title = title.replace('"', '\\"').replace(':', '\\:').replace(',', '\\,')
-            print(title)
+            print(title, url)
             result += ('{0}. ' + title + '   ').format(i+1)
         f.write(result)
