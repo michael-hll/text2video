@@ -225,6 +225,7 @@ def get_init_video(article):
         nologo_checkbox = WebDriverWait(driver, 180).until(
             EC.presence_of_element_located((By.XPATH, "//input[contains(@class, 'ant-checkbox-input')]")))       
         nologo_checkbox.click()
+        time.sleep(3)
         
         # 点击生成视频
         div = driver.find_element(By.XPATH, "//div[contains(@class, 'ant-modal-footer')]")

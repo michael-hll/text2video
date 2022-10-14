@@ -82,6 +82,7 @@ Tube:
     - PATH: {text2video_root}
     - COMMAND: python3 s_weathers.py {HEFENG_API_KEY} 'shenzhen,shanghai,beijing' d_weathers.txt 12
     - GET_FILE_KEY_VALUE: -f d_weathers.txt
+    - FILE_READ: -f d_news.txt -v news -g
     - PATH: '{text2video_root}/tmp'
     - COMMAND: >
         ffmpeg -y {video_duration} -i {output_final_draft} -filter_complex "
@@ -98,8 +99,15 @@ Tube:
                fontsize=50:
                text='{weathers}':
                x=mod(230*t\,w+tw)-tw:y=1:
-               box=1:boxcolor=black@0.8
-        "
+               box=1:boxcolor=black@0.8,
+            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+               fontcolor=white:
+               fontsize=50:
+               text='{news}':
+               x=w-mod(280*t\,w+tw):
+               y=55:
+               box=1:boxcolor=black@0.8"
+               
         -codec:a copy -y {output_final_prefix}tcw.mp4
     
     # # Step 5: Add logo

@@ -1,0 +1,8 @@
+Tube:
+    - GET_FILE_KEY_VALUE: -f t_apikeys.yaml
+    - COMMAND: python3 s_news.py {NEWS_API_KEY}
+    
+
+
+
+        
