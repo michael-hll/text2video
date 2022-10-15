@@ -90,7 +90,7 @@ def get_init_video(article):
         button = driver.find_element(By.TAG_NAME, "button")
         time.sleep(0.2)
         button.click()
-        time.sleep(3)
+        time.sleep(2)
 
         # 数字人设置
         # 找到主要的div
@@ -221,10 +221,12 @@ def get_init_video(article):
         
         # 切回到主窗口
         driver.switch_to.parent_frame()
+        print('Plase wait for generating the video...')
         # https://stackoverflow.com/questions/59130200/selenium-wait-until-element-is-present-visible-and-interactable
         nologo_checkbox = WebDriverWait(driver, 180).until(
-            EC.presence_of_element_located((By.XPATH, "//input[contains(@class, 'ant-checkbox-input')]")))       
-        nologo_checkbox.click()
+            EC.presence_of_element_located((By.XPATH, "//input[contains(@class, 'ant-checkbox-input')]")))   
+        if nologo_checkbox.get_attribute('disabled') != 'true':     
+            nologo_checkbox.click()
         time.sleep(3)
         
         # 点击生成视频
@@ -232,7 +234,7 @@ def get_init_video(article):
         buttons = driver.find_elements(By.TAG_NAME, 'button')
         button = buttons[len(buttons) - 1]
         button.click()
-        time.sleep(3)
+        time.sleep(5)
         
         # 找到生成的视频列表并取第一个
         divs = driver.find_elements(By.XPATH, "//div[contains(@class, 'list__box')]")
