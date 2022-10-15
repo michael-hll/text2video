@@ -155,7 +155,7 @@ Tube:
     - SET_VARIABLE: -n author -v "{author}".replace(":","\\:")
     - SET_VARIABLE: -n start3 -v 16 --if {news_date} == ''
     - SET_VARIABLE: -n start3 -v 26 --if {news_date} != ''
-    - SET_VARIABLE: >
+    - SET_VARIABLE: --note abc
         -n alpha2
         -v 
             if(lt(t,{start2}),0,
