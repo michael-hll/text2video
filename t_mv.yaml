@@ -84,6 +84,8 @@ Tube:
     - GET_FILE_KEY_VALUE: -f d_weathers.txt
     - FILE_READ: -f d_news.txt -v news -g
     - PATH: '{text2video_root}/tmp'
+    # x=mod(230*t\,w+tw)-tw:y=1: from right to left
+    # x=w-mod(280*t\,w+tw):y=1: from left to right
     - COMMAND: >
         ffmpeg -y {video_duration} -i {output_final_draft} -filter_complex "
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{title}':
@@ -98,22 +100,17 @@ Tube:
                fontcolor=yellow:
                fontsize=50:
                text='{weathers}':
-               x=mod(230*t\,w+tw)-tw:y=1:
-               box=1:boxcolor=black@0.8,
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
-               fontcolor=white:
-               fontsize=50:
-               text='{news}':
-               x=w-mod(280*t\,w+tw):
-               y=55:
+               x=w-mod(230*t\,w+tw):y=1:
                box=1:boxcolor=black@0.8"
                
         -codec:a copy -y {output_final_prefix}tcw.mp4
     
     # # Step 5: Add logo
     - PATH: '{text2video_root}/tmp'
+    - SET_VARIABLE: -n logo -v cnBeta.png --if media_type == cb
+    - SET_VARIABLE: -n logo -v wallstreet.png --if media_type == ws
     - COMMAND: >
-        ffmpeg -y {video_duration} -i {output_final_prefix}tcw.mp4 -i cnBeta.png -i Rnews.jpg
+        ffmpeg -y {video_duration} -i {output_final_prefix}tcw.mp4 -i {logo} -i Rnews.jpg
         -filter_complex "
             [1:v]colorkey=0xffffff:0.3:0.2[ckout1];
             [2:v]colorkey=0x00ff00:0.3:0.2[ckout2];

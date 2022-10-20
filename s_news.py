@@ -39,7 +39,8 @@ if __name__ == '__main__':
         result = ''
         for i, article in enumerate(articles):
             title = article['title'].replace('Sina', '新浪').replace('- VOA Mandarin', '').replace('- People', '').replace('','').replace('Sohu','搜狐')  
-            if 'BBC' in title or '彩票' in title or '双色球' in title or '体彩' in title or '足彩' in title or 'China Daily' in title or 'jsnews' in title:
+            if 'BBC' in title or '彩票' in title or '双色球' in title or '体彩' in title or '足彩' in title or 'China Daily' in title or 'jsnews' in title or \
+              '福彩' in title:
                 continue          
             url = article['url']
             title = title.replace('"', '\\"').replace(':', '\\:').replace(',', '\\,')
