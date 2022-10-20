@@ -1,12 +1,12 @@
 ~
 tmp
 tmp2
-t_article.yaml
+d_article.yaml
 t_mv.yaml.log
 tube
 tube.log
 .DS_Store
-t_apikeys.yaml
+d_apikeys.yaml
 t_test.yaml
 t_test.yaml.log
 __pycache__
