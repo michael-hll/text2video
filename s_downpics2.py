@@ -7,7 +7,7 @@ from s_utility import Utility
 
 key_file = './d_apikeys.yaml'
 keywords = 'microsoft apple'
-count = 50
+count = 5
 out_dir = './tmp2'
 pic_name = 'bg{:02d}.jpg'
 if len(sys.argv) >= 3:
