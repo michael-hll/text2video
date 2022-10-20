@@ -36,10 +36,10 @@ Tube:
     - COMMAND: rm 未命名*.mp4 --continue --if {del}
     - COMMAND: rm *.ass --continue --if {del}
     - PATH: {text2video_root}
-    - GET_FILE_KEY_VALUE: -f ./t_article.yaml -g
-    - COMMAND: python3 s_t2v.py ./t_article.yaml --if {t2v}
+    - GET_FILE_KEY_VALUE: -f ./d_article.yaml -g
+    - COMMAND: python3 s_t2v.py ./d_article.yaml --if {t2v}
     # Wating the video download to be finished
-    - RUN_TUBE: -t WaitngDownload -w {downloaded} == no --if {t2v}
+    - RUN_TUBE: WaitngDownload -w {downloaded} == no --if {t2v}
     - PATH: {downloads}
     # get video download file name
     - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{print "vname="$NF}' > video_init_name.txt --if {t2v}
@@ -58,8 +58,8 @@ Tube:
     - COMMAND: rm bg*.jpg --continue --if {dpics} {del}    
     - PATH: {text2video_root}
     # get background pictures
-    - GET_FILE_KEY_VALUE: -f t_apikeys.yaml -g
-    - COMMAND: python3 s_downpics.py ./t_apikeys.yaml '{keywords}' 20 ./tmp --if {dpics}
+    - GET_FILE_KEY_VALUE: -f d_apikeys.yaml -g
+    - COMMAND: python3 s_downpics.py ./d_apikeys.yaml '{keywords}' 20 ./tmp --if {dpics}
     
     # # step 2: Split init video into pieces
     # # currently it seems limition be default it could split them into 10 seconds
@@ -208,14 +208,14 @@ Tube:
                 y={y}+{delta_h}*2 - 25,
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{xingzuo}':
-                fontsize={font_size} - 28:
+                fontsize={font_size}-28:
                 fontcolor={color_yellow}@1:
                 alpha='{alpha}':
                 x={x} + 455:
                 y={y} + 18,            
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{shengXiao}':
-                fontsize={font_size} - 28:
+                fontsize={font_size}-28:
                 fontcolor={color_yellow}@1:
                 alpha='{alpha}':
                 x={x} + 468:
@@ -275,6 +275,6 @@ Tube:
 
 WaitngDownload:
     - PATH: {downloads}
-    - FILE_EXIST: -f 未命名*.mp4 -v downloaded -g
-    - FILE_EXIST: -f 未命名*.ass -v downloaded -g
+    - FILE_EXIST: 未命名*.mp4 -v downloaded -g
+    - FILE_EXIST: 未命名*.ass -v downloaded -g
     - PAUSE: 0.05    
