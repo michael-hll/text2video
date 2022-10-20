@@ -1,0 +1,10 @@
+Tube:
+    - PATH: /Volumes/MacDrive/Projects/text2video
+    - GET_FILE_KEY_VALUE: -f ./t_article.yaml
+    - PRINT_VARS: '*'
+    - COMMAND: ECHO TEST --if {media_type} == ws
+    
+
+
+
+        

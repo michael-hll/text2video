@@ -2,10 +2,13 @@ import requests
 import sys,os
 from s_utility import Utility
 
-key_file = './apikeys.yaml'
-keywords = 'microsoft'
-count = 20
-out_dir = './tmp'
+# inputs: keyfile, keywords, [count=50], [outdir], [pic_name=bg{:02d}.jpg]
+# outputs: ./tmp2
+
+key_file = './d_apikeys.yaml'
+keywords = 'microsoft apple'
+count = 50
+out_dir = './tmp2'
 pic_name = 'bg{:02d}.jpg'
 if len(sys.argv) >= 3:
     key_file = sys.argv[1]
@@ -17,39 +20,52 @@ if len(sys.argv) >=5:
 if len(sys.argv) >=6:
     pic_name = sys.argv[5]
 
+API_KEY = 'MICROSOFTY_API_KEY'
+
 # https://portal.azure.com/?quickstart=true#home
-subscription_key=Utility.get_api_key(key_file, 'MICROSOFTY_API_KEY')
-search_url = "https://api.bing.microsoft.com/v7.0/images/search"
-search_term = keywords
-headers = {"Ocp-Apim-Subscription-Key" : subscription_key}
-params  = {"q": search_term}
+# Advanced search keywords: https://support.microsoft.com/en-us/topic/advanced-search-keywords-ea595928-5d63-4a0b-9c6b-0b769865e78a
+def search_image_by_keyword(keyword):
+    subscription_key=Utility.get_api_key(key_file, API_KEY)
+    search_url = "https://api.bing.microsoft.com/v7.0/images/search"
+    search_term = keyword
+    headers = {"Ocp-Apim-Subscription-Key" : subscription_key}
+    params  = {"q": search_term}
 
-response = requests.get(search_url, headers=headers, params=params)
-response.raise_for_status()
-search_results = response.json()
-print(search_results)
+    response = requests.get(search_url, headers=headers, params=params)
+    response.raise_for_status()
+    search_results = response.json()
+    if search_results:
+        return search_results['value']
+    else:
+        return None
 
+keywords = keywords.split(' ')
 # download photos by keywords
 i = 0
-for pic in search_results['value']:    
-    url = pic['contentUrl']
-    width = pic['width']
-    height = pic['height']
-    if width < height:
-      pass
-      #continue
-    print('Downloading: {0}'.format(url))
-    try:
-        r = requests.get(url, verify=False, timeout=2)
-        with open(os.path.join(out_dir, pic_name.format(i)), 'wb') as f:
-            f.write(r.content)
-            i += 1
-        if i >= count:
-          break
-    except Exception as e:
-        print('Download picture fail:' + str(e))
+for j, key in enumerate(keywords):
+    keyword_count = 0
+    print('Searching with keyword: ' + key)
+    for pic in search_image_by_keyword(key):  
+        url = pic['contentUrl']
+        width = pic['width']
+        height = pic['height']
+        if not int(pic['contentSize'].strip('B').strip()) > 0:
+            continue
+        # if width < height:
+        #     continue
+        print('Downloading: {0}'.format(url))
+        try:
+            r = requests.get(url, verify=False, timeout=3)
+            with open(os.path.join(out_dir, pic_name.format(i)), 'wb') as f:
+                f.write(r.content)
+                i += 1
+                keyword_count += 1
+            if keyword_count >= count:
+                break
+        except Exception as e:
+            print('Download picture fail:' + str(e))
 
-'''
+''' resonpnse data format
 {
   '_type': 'Images',
   'instrumentation': {
