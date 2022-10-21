@@ -19,3 +19,5 @@ all_pics.txt
 *.yaml.log
 *news.txt
 tmp.txt
+dpics/*.mp4
+dpics/*.png

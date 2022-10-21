@@ -1,90 +1,111 @@
 Variables:
     text2video_root: /volumes/macdrive/projects/text2video
-    input:
-    output:
-    curr_line:
-    font_size: 90
-    font_color: yellow
+    font_title_color: red
+    font_title_bg_color: yellow
+    font_color: blue
     text_left: 40
     text_top: 40
 
 TUBE:
-    # All output files are located in tmp/dpics folder
+    # All output files are located in dpics folder
     - PATH: {text2video_root}
     # generate news text and background with title
-    # outputs: bg_hd_t2.png, news.txt
-    - RUN_TUBE: -t GenNewsText
-    # adjust background dimension to 1080:1920
-    - COMMAND: ffmpeg -y -i tmp/dpics/bg.png -filter:v "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" tmp/dpics/bg_hd.png
+    # outputs: news.txt, bg01_hd_title.png
+    - RUN: GenNewsTitleAndBG
+
+    - CMD: stops here --if no
+   
     # write news to picture background
-    - RUN_TUBE: -t WriteText    
-    # picture to video
-    - COMMAND: ffmpeg -y -loop 1 -i {output} -c:v libx264 -t 10 -pix_fmt yuv420p tmp/dpics/bg_video.mp4
-    # video to images
-    - COMMAND: rm tmp/dpics/*.jpg --continue
-    - COMMAND: ffmpeg -y -i tmp/dpics/bg_video.mp4 ./tmp/dpics/img%03d.jpg
+    - RUN: WriteTextToImg   
+
+    - CMD: stops here --if no
+
+    # bg02_hd_news.png to video: bg_video
+    - COMMAND: ffmpeg -y -loop 1 -i {output} -c:v libx264 -t 10 -pix_fmt yuv420p dpics/bg_video.mp4
+    - COMMAND: rm dpics/*.jpg --continue
+    # bg_video.mp4 to frames
+    - COMMAND: ffmpeg -y -i dpics/bg_video.mp4 ./dpics/tmp/img%03d.jpg
     # Generate new video, 
     # outputs: pics_video.mp4
-    - RUN_TUBE: -t CropPicsToVideo
-    - COMMAND: rm tmp/dpics/*.jpg --continue
-    - COMMAND: rm tmp/dpics/bg_news*.png --continue
-    # combine the bg_hd_t2.png, pics_video.mp4
+    - RUN_TUBE: CropPicsToVideo   
+    
+    # combine the bg02_hd_news.png, pics_video.mp4
     - COMMAND: >
-         ffmpeg -y -i tmp/dpics/bg_hd_t2.png -i tmp/dpics/pics_video.mp4 -filter_complex
+         ffmpeg -y -i dpics/bg01_hd_title.png -i dpics/pics_video.mp4 -filter_complex
             "[1]scale=-1:ih-300,colorkey=0x000000:0.2:0.3[v1];[0][v1]overlay=100:300[out]" 
-         -map "[out]" tmp/dpics/out.mp4
-    - COMMAND: ffplay tmp/dpics/out.mp4
+         -map "[out]" dpics/out.mp4
+    
+    - F_DELETE: dpics/tmp/*.jpg 
+    - F_DELETE: dpics/bg*hd*.png
+    - F_DELETE: dpics/news.txt
+    - F_DELETE: dpics/all_pics.txt
+    - F_DELETE: dpics/pics_video.mp4 
+    - F_DELETE: dpics/bg_video.mp4
+    - COMMAND: ffplay dpics/out.mp4    
 
-GenNewsText:
-    - GET_FILE_KEY_VALUE: -f tmp/dpics/news.yaml
-    - COMMAND: python3 s_splitNews.py '{content}' tmp/dpics/news.txt 10
-    - COMMAND: ffmpeg -y -i tmp/dpics/bg_backup.png -filter:v "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" tmp/dpics/bg_hd_t.png
+GenNewsTitleAndBG:
+    # input: bg01.png, {title}, {content}
+    - GET_FILE_KEY_VALUE: -f dpics/news.yaml
+    - COMMAND: python3 s_splitNews.py '{content}' dpics/news.txt 10
+    # adjust the background picture to 1080:1920
+    - COMMAND: ffmpeg -y -i dpics/bg01.png -filter:v "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" dpics/bg01_hd.png
+    # draw title to background
     - COMMAND: >
-        ffmpeg -y -i tmp/dpics/bg_hd_t.png -filter_complex
+        ffmpeg -y -i dpics/bg01_hd.png -filter_complex
              "drawbox=
                 x=0:
                 y=120:
-                color=yellow@1:
+                color={font_title_bg_color}@1:
                 width=1080:height=150:t=fill,
              drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{title}':
-                fontcolor=blue:
+                fontcolor={font_title_color}:
                 fontsize=120:
                 x=(w-tw)/2:
                 y=140" 
-            tmp/dpics/bg_hd_t2.png
+            dpics/bg01_hd_title.png
 
-WriteText:
+WriteTextToImg:
+    # input: bg02.png, news.txt
+    # adjust background dimension to 1080:1920
+    - COMMAND: ffmpeg -y -i dpics/bg02.png -filter:v "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" dpics/bg02_hd.png
     # write news content to background
-    - COUNT: -f tmp/dpics/news.txt -v news_count
-    - SET_VARIABLE: -n curr_line -v 0 -g
-    - SET_VARIABLE: -n fontHeight -v 50 -g
-    - SET_VARIABLE: -n input -v tmp/dpics/bg_hd.png -g
-    - RUN_TUBE: -t WriteLine -w {curr_line} < {news_count}
-WriteLine:
-    - SET_VARIABLE: -n input -v {output} --if {output} != '' -g
-    - SET_VARIABLE: -n curr_line -v {curr_line} + 1 -g
-    - READ_LINE_IN_FILE: -f tmp/dpics/news.txt -n {curr_line} -v line    
+    - COUNT: -f dpics/news.txt -v news_count
+    - SET_VAR: curr_line = 0
+    - SET_VAR: fontHeight = 50
+    - SET_VAR: font_size = 90
+    - SET_VAR: input = dpics/bg02_hd.png
+    - SET_VAR: output = 'tmp' -g
+    - RUN: WriteLineToImage -w curr_line < news_count
+
+WriteLineToImage:
+    - SET_VAR: input = output --if output != 'tmp'
+    - SET_VAR: curr_line = curr_line + 1 -g
+    - READ_LINE: -f dpics/news.txt -n {curr_line} -v line    
+    - SET_VAR: output_tmp = dpics/bg02_hd_news_tmp.png --if output == 'tmp'
+    - SET_VAR: output = dpics/bg02_hd_news.png --if output == 'tmp' -g
     - COMMAND: >
         ffmpeg -y -i {input} -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{line}':fontcolor={font_color}:
                 fontsize={font_size}:
                 x=(w-tw)/2:
                 y={fontHeight}" 
-            tmp/dpics/bg_news_hd{curr_line}.png
-    - SET_VARIABLE:  -n output -v tmp/dpics/bg_news_hd{curr_line}.png -g      
-    - SET_VARIABLE: -n fontHeight -v {fontHeight} + {font_size} -g
+                {output_tmp}
+    - FILE_COPY: -s {output_tmp} -d {output}
+    - FILE_DELETE: {output_tmp}
+    - SET_VAR: fontHeight = fontHeight + font_size
 
 CropPicsToVideo:
     - PATH: '{text2video_root}'
-    - LIST_FILES: -d tmp/dpics/*.jpg -r tmp/dpics/all_pics.txt -s name
-    - SET_VARIABLE: -n curr_line -v 0 -g
-    - RUN_TUBE: -t CROP -w {curr_line} < 250
-    - COMMAND: ffmpeg -y -r 25 -i tmp/dpics/img%03d_o.jpg tmp/dpics/pics_video.mp4
+    - LIST_FILES: dpics/tmp/*.jpg -r dpics/all_pics.txt -s name
+    - SET_VAR: curr_line = 0
+    - RUN_TUBE: CROP -w curr_line < 250
+    - COMMAND: ffmpeg -y -r 25 -i dpics/tmp/img%03d_o.jpg dpics/pics_video.mp4
+
 CROP:
-    - SET_VARIABLE: -n curr_line -v {curr_line} + 1 -g
-    - READ_LINE_IN_FILE: -f tmp/dpics/all_pics.txt -n {curr_line} -v line
-    - SET_VARIABLE: -n line -v "{line}".replace(".jpg","") --if {line} != '' -g
+    - SET_VAR: curr_line = curr_line + 1 -g
+    - READ_LINE: -f dpics/all_pics.txt -n {curr_line} -v line
+    - SET_VAR: line = "{line}".replace(".jpg","") --if {line} != ''
     - COMMAND: ffmpeg -y -i {line}.jpg -filter:v "crop=iw:(1920/250)*{curr_line}:0:0,pad=1080:1920" {line}_o.jpg --if {line} != ''
 
 Notes: >
