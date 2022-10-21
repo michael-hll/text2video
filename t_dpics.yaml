@@ -37,8 +37,8 @@ TUBE:
 
 GenNewsTitleAndBG:
     # input: bg01.png, {title}, {content}
-    - GET_FILE_KEY_VALUE: -f dpics/news.yaml
-    - COMMAND: python3 s_splitNews.py '{content}' dpics/news.txt 10
+    - GET_KEYS: -f dpics/news.yaml
+    - RUN: WriteNewsToFile
     # adjust the background picture to 1080:1920
     - COMMAND: ffmpeg -y -i dpics/bg01.png -filter:v "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" dpics/bg01_hd.png
     # draw title to background
@@ -56,6 +56,17 @@ GenNewsTitleAndBG:
                 x=(w-tw)/2:
                 y=140" 
             dpics/bg01_hd_title.png
+
+WriteNewsToFile:
+    - set_var: i = 0
+    - f_empty: dpics/news.txt -c
+    - set_var: loop_times = int(len(content)/10+1)
+    - run: WriteLineToText --while i < loop_times
+
+WriteLineToText:
+    - set_var: line = content[i*10:i*10 + 10].strip()
+    - write_line: -f dpics/news.txt -v {line} --if len(line) > 0
+    - set_var: i = i + 1 -g
 
 WriteTextToImg:
     # input: bg02.png, news.txt
