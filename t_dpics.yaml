@@ -107,7 +107,7 @@ CropPicsToVideo:
     - COMMAND: ffmpeg -y -loop 1 -i {output} -c:v libx264 -t {seconds} -pix_fmt yuv420p dpics/bg_video.mp4
     # bg_video.mp4 to frames
     - COMMAND: ffmpeg -y -i dpics/bg_video.mp4 ./dpics/tmp/img%03d.jpg
-    - LIST_FILES: dpics/tmp/*.jpg -r dpics/all_pics.txt -s name
+    - LIST_FILES: -d dpics/tmp/*.jpg -r dpics/all_pics.txt -s name
     - COUNT: -f dpics/all_pics.txt -v total_pics
     - SET_VAR: curr_line = 0
     - RUN_TUBE: CROP --while curr_line < total_pics

@@ -179,8 +179,8 @@ Tube:
     
     # decide the color of dayOfWeek
     - SET_VARIABLE: -n dayOfWeek -v datetime.today().weekday()
-    - SET_VARIABLE: -n color_day -v green --if {dayOfWeek} < 5
-    - SET_VARIABLE: -n color_day -v red --if {dayOfWeek} > 4
+    - SET_VARIABLE: -n color_day -v '0x00FF2E' --if {dayOfWeek} < 5
+    - SET_VARIABLE: -n color_day -v '0xFF0000' --if {dayOfWeek} > 4
     
     # begin to draw Gongli, Nongli, Xingqi, TianGan, Dizhi    
     - COMMAND: >
@@ -234,7 +234,7 @@ Tube:
                 alpha='{alpha}':
                 x={x}+78:
                 y={y}+{delta_h}*2 + 8,
-            drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.1:
+            drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.3:
                 width=650:height=50:t=fill:enable='between(t,{start2},{start2}+2+{duration}+2)',
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{news_date}':
@@ -243,7 +243,7 @@ Tube:
                 alpha='{alpha2}':
                 x={x}+15:
                 y={y}+{delta_h}*2 + 20,
-            drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.1:
+            drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.3:
                 width=380:height=50:t=fill:enable='between(t,{start3},{start3}+2+{duration}+2)',
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{source}':
@@ -252,7 +252,7 @@ Tube:
                 alpha='{alpha3}':
                 x={x}+15:
                 y={y}+{delta_h}*2 + 20,
-            drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.1:
+            drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.3:
                 width=380:height=50:t=fill:enable='between(t,{start4},{start4}+2+{duration}+2)',
             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
                 text='{author}':
@@ -275,6 +275,6 @@ Tube:
 
 WaitngDownload:
     - PATH: {downloads}
-    - FILE_EXIST: 未命名*.mp4 -v downloaded -g
-    - FILE_EXIST: 未命名*.ass -v downloaded -g
+    - FILE_EXIST: -f 未命名*.mp4 -v downloaded -g
+    - FILE_EXIST: -f 未命名*.ass -v downloaded -g
     - PAUSE: 0.05    
