@@ -1,0 +1,70 @@
+# running command: python3 command-tube.py -t ../text2video/t_getHDimgs -fdc -v keywords = '俄罗斯 光刻机 ASML', dcount=5
+Variables:
+    img_name_file: download_img.txt
+Tube:    
+    - set_var: download_floder = tmp2
+    - RUN: DownPics2
+    - PATH: /Volumes/MacDrive/Projects/text2video/{download_floder}
+    - LIST_F: -d img*.jpg -r {img_name_file}
+    - COUNT: -f {img_name_file} -v img_count
+    - set_var: i = 0
+    - set_var: j = 0
+    - F_DELETE: bg*.jpg
+    - run: MakeImgHD --while i < img_count
+    - F_DELETE: 'img*.log'
+
+MakeImgHD:
+    - set_var: i = i + 1 -g    
+    - read_line: -f {img_name_file} -n {i} -v image_name
+    - print_vars: '*'
+    - run: GetMediaInfo -v file = {image_name}
+    - get_keys: -f {image_name}.log -k width,height,size
+
+    # vertical img to horizontal HD 
+    - set_var: v2hd_result = 0      
+    - set_var: out = 'bg{j:02d}.jpg'  
+    - run: v2hd --if size > 4096 and width < height -v in_file = {image_name}, out_file = {out}
+    - set_var: j = j + 1 -g --if {v2hd_result} == 1 -g
+
+    # horizontal img to horizontal HD
+    - set_var: w2hd_result = 0
+    - set_var: out = 'bg{j:02d}.jpg'
+    - run: w2hd --if size > 4069 and width > height -v in_file = {image_name}, out_file = {out}
+    - set_var: j = j + 1 -g --if {w2hd_result} == 1 -g
+    
+V2HD: 
+    # input: {in_file} 
+    # output: {out_file}
+    # make a vertical picture to a horizontal HD
+    - cmd: ffmpeg -y -i {in_file} -filter_complex 
+        "[0]split=2[in1][in2];
+         [in1]scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,boxblur=15[out1];
+         [in2]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1:color=0x00ff00[out2];
+         [out2]colorkey=0x00ff00:0.3:0.2[out3];
+         [out1][out3]overlay=x=0:y=0[out]"
+        -map "[out]" {out_file}
+    - set_var: v2hd_result = 1 -g
+
+W2HD:
+    # input: {in_file} 
+    # output: {out_file}
+    # make a horizontal picture to a horizontal HD
+    - cmd: ffmpeg -y -i {in_file} -filter:v "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080" {out_file}
+    - set_var: w2hd_result = 1 -g
+
+GetMediaInfo:
+    # input: {file}
+    # output: {file}.log
+    - CMD: ffprobe -v error -select_streams v:0 -show_format -show_entries stream -of default=nw=1 {file} --result {file}.log
+
+DownPics2:
+    # input: {keywords} {dcount=5}
+    # => -v keywords = '俄罗斯 光刻机 7纳米光刻机 ASML', dcount=5
+    - PATH: /Volumes/MacDrive/Projects/text2video/
+    - F_DELETE: '{download_floder}/img*.jpg'
+    - CMD: python3 s_downpics2.py d_apikeys.yaml '{keywords}' {dcount}
+    
+
+
+
+        

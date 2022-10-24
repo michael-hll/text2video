@@ -1,9 +1,16 @@
+Variables:
+   j: 0
 Tube:
-    - PATH: /Volumes/MacDrive/Projects/text2video
-    - GET_FILE_KEY_VALUE: -f ./t_article.yaml
-    - PRINT_VARS: '*'
-    - COMMAND: ECHO TEST --if {media_type} == ws
+    #- SET_VAR: img = 'bg{j:02d}.jpg'
+    - run: subtube
+    #- SET_VAR: img = 'bg{i:02d}.jpg'
+    # - SET_VAR: i = 1
+    # - SET_VAR: name = img.format(i)
+SubTube:
+    - set_var: x = 1
+    - SET_VAR: img = 'bg{j:02d}.jpg'
     
+
 
 
 

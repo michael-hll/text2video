@@ -9,7 +9,7 @@ key_file = './d_apikeys.yaml'
 keywords = 'microsoft apple'
 count = 5
 out_dir = './tmp2'
-pic_name = 'bg{:02d}.jpg'
+pic_name = 'img{:02d}.jpg'
 if len(sys.argv) >= 3:
     key_file = sys.argv[1]
     keywords = sys.argv[2]
@@ -51,15 +51,13 @@ for j, key in enumerate(keywords):
         height = pic['height']
         if not int(pic['contentSize'].strip('B').strip()) > 0:
             continue
-        # if width < height:
-        #     continue
         print('Downloading: {0}'.format(url))
         try:
             r = requests.get(url, verify=False, timeout=3)
             with open(os.path.join(out_dir, pic_name.format(i)), 'wb') as f:
                 f.write(r.content)
-                i += 1
-                keyword_count += 1
+            i += 1
+            keyword_count += 1
             if keyword_count >= count:
                 break
         except Exception as e:
