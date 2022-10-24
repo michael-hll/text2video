@@ -1,17 +1,19 @@
 # running command: python3 command-tube.py -t ../text2video/t_getHDimgs -fdc -v keywords = '俄罗斯 光刻机 ASML', dcount=5
 Variables:
+    down_pic: yes
     img_name_file: download_img.txt
 Tube:    
-    - set_var: download_floder = tmp2
-    - RUN: DownPics2
-    - PATH: /Volumes/MacDrive/Projects/text2video/{download_floder}
+    - set_var: download_folder = tmp2
+    - RUN: DownPics2 --if down_pic
+    - PATH: /Volumes/MacDrive/Projects/text2video/{download_folder}
     - LIST_F: -d img*.jpg -r {img_name_file}
     - COUNT: -f {img_name_file} -v img_count
     - set_var: i = 0
     - set_var: j = 0
     - F_DELETE: bg*.jpg
+    - F_DELETE: img*.log
     - run: MakeImgHD --while i < img_count
-    - F_DELETE: 'img*.log'
+    - F_DELETE: img*.log
 
 MakeImgHD:
     - set_var: i = i + 1 -g    
@@ -61,7 +63,7 @@ DownPics2:
     # input: {keywords} {dcount=5}
     # => -v keywords = '俄罗斯 光刻机 7纳米光刻机 ASML', dcount=5
     - PATH: /Volumes/MacDrive/Projects/text2video/
-    - F_DELETE: '{download_floder}/img*.jpg'
+    - F_DELETE: '{download_folder}/img*.jpg'
     - CMD: python3 s_downpics2.py d_apikeys.yaml '{keywords}' {dcount}
     
 
