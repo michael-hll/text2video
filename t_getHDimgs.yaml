@@ -2,8 +2,8 @@
 Variables:
     down: yes
     img_name_file: download_img.txt
+    download_folder: tmp
 Tube:    
-    - set_var: download_folder = tmp2
     - RUN: DownPics2 --if down
     - PATH: /Volumes/MacDrive/Projects/text2video/{download_folder}
     - LIST_F: -d img*.jpg -r {img_name_file}
@@ -64,7 +64,7 @@ DownPics2:
     # => -v keywords = '俄罗斯 光刻机 7纳米光刻机 ASML', dcount=5
     - PATH: /Volumes/MacDrive/Projects/text2video/
     - F_DELETE: '{download_folder}/img*.jpg'
-    - CMD: python3 s_downpics2.py d_apikeys.yaml '{keywords}' {dcount}
+    - CMD: python3 s_downpics2.py d_apikeys.yaml '{keywords}' {dcount} {download_folder}
     
 
 
