@@ -100,7 +100,7 @@ Tube:
                fontcolor=yellow:
                fontsize=50:
                text='{weathers}':
-               x=w-mod(230*t\,w+tw):y=1:
+               x=w-mod(230*t\,w+tw):y=0:
                box=1:boxcolor=black@0.8"
                
         -codec:a copy -y {output_final_prefix}tcw.mp4

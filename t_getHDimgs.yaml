@@ -3,6 +3,7 @@ Variables:
     down: yes
     img_name_file: download_img.txt
     download_folder: tmp
+    
 Tube:    
     - RUN: DownPics2 --if down
     - PATH: /Volumes/MacDrive/Projects/text2video/{download_folder}
