@@ -86,17 +86,18 @@ Tube:
     - PATH: '{text2video_root}/tmp'
     # x=mod(230*t\,w+tw)-tw:y=1: from right to left
     # x=w-mod(280*t\,w+tw):y=1: from left to right
+    # 彼岸花.ttf
     - COMMAND: >
         ffmpeg -y {video_duration} -i {output_final_draft} -filter_complex "
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{title}':
+            drawtext=fontfile='../fonts/基督山伯爵.ttf':text='{title}':
                 fontcolor=yellow:fontsize=125:enable='between(t,0,5)':
                 box=1:boxcolor=black@0.6:boxborderw=5:x=(w-text_w)/2:y=(h/2):expansion=none,
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':text='{sub_title}':
+            drawtext=fontfile='../fonts/基督山伯爵.ttf':text='{sub_title}':
                 fontcolor=#2B39FF:fontsize=60:enable='between(t,0,5)':
                 box=1:boxcolor=yellow@0.8:boxborderw=5:x=(w-text_w)/2:y=(h/2 + 2.5*text_h):expansion=none,
             drawbox=x=300:y=945:w=1320:h=80:color=black@0.8:t=fill,
             ass=subtitle.ass,
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/庞中华硬笔字体.ttf':
                fontcolor=yellow:
                fontsize=50:
                text='{weathers}':
@@ -185,49 +186,49 @@ Tube:
     # begin to draw Gongli, Nongli, Xingqi, TianGan, Dizhi    
     - COMMAND: >
         ffmpeg -y {video_duration} -i {output_final_prefix}tl2_dates.mp4 -filter_complex "
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{gongli}':
                 fontsize={font_size}:
                 fontcolor={color_white}@1:
                 alpha='{alpha}':
                 x={x}:
                 y={y},
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{yTG_DZ}{nongli}':
                 fontsize={font_size}-10:
                 fontcolor={color_white}@1:
                 alpha='{alpha}':
                 x={x}:
                 y={y}+{delta_h}+4,
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{xingqi}':
                 fontsize={font_size}:
                 fontcolor={color_day}@1:
                 alpha='{alpha}':
                 x={x} + 415:
                 y={y}+{delta_h}*2 - 25,
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{xingzuo}':
                 fontsize={font_size}-28:
                 fontcolor={color_yellow}@1:
                 alpha='{alpha}':
                 x={x} + 455:
                 y={y} + 18,            
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{shengXiao}':
                 fontsize={font_size}-28:
                 fontcolor={color_yellow}@1:
                 alpha='{alpha}':
                 x={x} + 468:
                 y={y} + 55,
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{jieQi}':
                 fontsize={font_size}-20:
                 fontcolor={color_yellow}@1:
                 alpha='{alpha}':
                 x={x}:
                 y={y}+{delta_h}*2,
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{jieQi_Date}':
                 fontsize={font_size}-16-10:
                 fontcolor={color_white}@1:
@@ -236,7 +237,7 @@ Tube:
                 y={y}+{delta_h}*2 + 8,
             drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.3:
                 width=650:height=50:t=fill:enable='between(t,{start2},{start2}+2+{duration}+2)',
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{news_date}':
                 fontsize={font_size}-15:
                 fontcolor={color_white}@1:
@@ -245,7 +246,7 @@ Tube:
                 y={y}+{delta_h}*2 + 20,
             drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.3:
                 width=380:height=50:t=fill:enable='between(t,{start3},{start3}+2+{duration}+2)',
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{source}':
                 fontsize={font_size}-15:
                 fontcolor={color_white}@1:
@@ -254,7 +255,7 @@ Tube:
                 y={y}+{delta_h}*2 + 20,
             drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.3:
                 width=380:height=50:t=fill:enable='between(t,{start4},{start4}+2+{duration}+2)',
-            drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+            drawtext=fontfile='../fonts/彼岸花.ttf':
                 text='{author}':
                 fontsize={font_size}-15:
                 fontcolor={color_white}@1:

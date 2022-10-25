@@ -23,3 +23,5 @@ dpics/*.mp4
 dpics/*.png
 dpics/news.yaml
 .vscode
+fonts
+fonts.txt
