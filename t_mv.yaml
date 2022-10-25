@@ -86,7 +86,7 @@ Tube:
     - PATH: '{text2video_root}/tmp'
     # x=mod(230*t\,w+tw)-tw:y=1: from right to left
     # x=w-mod(280*t\,w+tw):y=1: from left to right
-    # 彼岸花.ttf
+    # 彼岸花.ttf 未央简体.ttf
     - COMMAND: >
         ffmpeg -y {video_duration} -i {output_final_draft} -filter_complex "
             drawtext=fontfile='../fonts/基督山伯爵.ttf':text='{title}':

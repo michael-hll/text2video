@@ -1,4 +1,4 @@
-# running command: python3 command-tube.py -t ../text2video/t_getHDimgs -fdc -v keywords = '俄罗斯 光刻机 ASML', dcount=5
+# running command: tube -t t_getHDimgs -fdc -v keywords = '俄罗斯 光刻机 ASML', dcount=5
 Variables:
     down: yes
     img_name_file: download_img.txt
@@ -14,6 +14,7 @@ Tube:
     - F_DELETE: bg*.jpg
     - F_DELETE: img*.log
     - run: MakeImgHD --while i < img_count
+    - F_DELETE: img*.log
     - F_DELETE: img*.log
 
 MakeImgHD:
