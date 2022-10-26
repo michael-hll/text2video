@@ -49,10 +49,11 @@ GenNewsTitleAndBG:
                 y=120:
                 color={font_title_bg_color}@1:
                 width=1080:height=150:t=fill,
-             drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+             drawtext=fontfile='fonts/南宋书局体.ttf':
                 text='{title}':
                 fontcolor={font_title_color}:
-                fontsize=120:
+                fontsize=100:
+                borderw=6:bordercolor=gray:
                 x=(w-tw)/2:
                 y=140" 
             dpics/bg01_hd_title.png
@@ -72,7 +73,9 @@ WriteTextToImg:
     # input: bg02.png, news.txt
     # output: dpics/bg02_hd_news.png
     # adjust background dimension to 1080:1920
-    - COMMAND: ffmpeg -y -i dpics/bg02.png -filter:v "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" dpics/bg02_hd.png
+    - COMMAND: ffmpeg -y -i dpics/bg02.png -filter:v 
+                "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" 
+                 dpics/bg02_hd.png
     # write news content to background
     - COUNT: -f dpics/news.txt -v news_count
     - SET_VAR: curr_line = 0
@@ -89,9 +92,11 @@ WriteLineToImage:
     - SET_VAR: output_tmp = dpics/bg02_hd_news_tmp.png --if output == 'tmp'
     - SET_VAR: output = dpics/bg02_hd_news.png --if output == 'tmp' -g
     - COMMAND: >
-        ffmpeg -y -i {input} -vf "drawtext=fontfile='/library/Fonts/Arial Unicode.ttf':
+        ffmpeg -y -i {input} -vf 
+               "drawtext=fontfile='fonts/未央简体.ttf':
                 text='{line}':fontcolor={font_color}:
                 fontsize={font_size}:
+                borderw=4:bordercolor=black:
                 x=(w-tw)/2:
                 y={fontHeight}" 
                 {output_tmp}
