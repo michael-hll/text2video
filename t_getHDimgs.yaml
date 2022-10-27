@@ -1,10 +1,12 @@
-# running command: tube -t t_getHDimgs -fdc -v keywords = '俄罗斯 光刻机 ASML', dcount=5
+# running command: tube -t t_getHDimgs -fdc -v dcount=5
 Variables:
     down: yes
     img_name_file: download_img.txt
     download_folder: tmp
     
 Tube:    
+    - path: /Volumes/MacDrive/Projects/text2video
+    - get_keys: -f d_article.yaml -k keywords
     - RUN: DownPics2 --if down
     - PATH: /Volumes/MacDrive/Projects/text2video/{download_folder}
     - LIST_F: -d img*.jpg -r {img_name_file}
