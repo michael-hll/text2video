@@ -53,8 +53,9 @@ Tube:
     - COMMAND: mkdir -p ./tmp
     - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4  --if {t2v}
     - COMMAND: cp -f '{downloads}/{cname}' {text2video_root}/tmp/subtitle.ass  --if {t2v}
-    # remove backgound pictures  
+    # get backgournd images
     - PATH: {text2video_root}
+    - GET_FILE_KEY_VALUE: -f d_apikeys.yaml -g
     - cmd: tube -t t_getHDimgs -fdc -v dcount=3 --if {dpics}
     
     # # step 2: Split init video into pieces
