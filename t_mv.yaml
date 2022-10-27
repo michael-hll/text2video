@@ -203,6 +203,7 @@ Tube:
                 text='{xingqi}':
                 fontsize={font_size}:
                 fontcolor={color_day}@1:
+                borderw=1:bordercolor=#DCFFFF:
                 alpha='{alpha}':
                 x={x} + 415:
                 y={y}+{delta_h}*2 - 25,
@@ -235,7 +236,7 @@ Tube:
                 fontsize={font_size}-16-10:
                 fontcolor={color_white}@1:
                 alpha='{alpha}':
-                x={x}+78:
+                x={x}+83:
                 y={y}+{delta_h}*2 + 8,
             drawbox=x={x}+5:y={y}+{delta_h}*2+15:color={color_black}@0.3:
                 width=650:height=50:t=fill:enable='between(t,{start2},{start2}+2+{duration}+2)',
