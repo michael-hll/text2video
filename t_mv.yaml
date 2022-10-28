@@ -80,7 +80,11 @@ Tube:
     - COMMAND: python3 s_weathers.py {HEFENG_API_KEY} 'shenzhen,shanghai,beijing' d_weathers.txt 12
     - GET_FILE_KEY_VALUE: -f d_weathers.txt
     - FILE_READ: -f d_news.txt -v news -g
+    - set_var: date = datetime.now().strftime("%Y年%m月%d日")
     - PATH: '{text2video_root}/tmp'
+    # adjust subtitle font size and color
+    - write_ln: >
+        -f subtitle.ass -n 11 -v Style: Default,Alibaba PuHuiTi,100,&H2112FF,2,60,&HD7FEFF,1,3
     # x=mod(230*t\,w+tw)-tw:y=1: from right to left
     # x=w-mod(280*t\,w+tw):y=1: from left to right
     # 彼岸花.ttf 未央简体.ttf 南宋书局体.ttf
@@ -89,19 +93,25 @@ Tube:
             drawtext=fontfile='../fonts/南宋书局体.ttf':text='{title}':
                 fontcolor=yellow:fontsize=125:enable='between(t,0,5)':
                 borderw=4:bordercolor=#DCFFFF:
-                box=1:boxcolor=black@0.8:boxborderw=5:x=(w-text_w)/2:y=(h/2):expansion=none,
+                box=1:boxcolor=black@0.8:boxborderw=5:
+                x=(w-text_w)/2:y=(h/2):expansion=none,
             drawtext=fontfile='../fonts/南宋书局体.ttf':text='{sub_title}':
                 fontcolor=#2B39FF:fontsize=60:enable='between(t,0,5)':
                 borderw=2:bordercolor=#DCFFFF:
-                box=1:boxcolor=yellow@0.8:boxborderw=5:x=(w-text_w)/2:y=(h/2 + 2.5*text_h):expansion=none,
-            drawbox=x=300:y=945:w=1320:h=80:color=black@0.8:t=fill,
+                box=1:boxcolor=yellow@0.8:boxborderw=5:
+                x=(w-text_w)/2:y=(h/2 + 2.5*text_h):expansion=none,
+            drawtext=fontfile='../fonts/南宋书局体.ttf':text='{date}':
+                fontcolor=#FF122F:fontsize=55:enable='between(t,0,5)':
+                borderw=2:bordercolor=#DCFFFF:
+                x=(w-text_w)/2:y=((h/2 + 2.5*text_h)+105):expansion=none,
+            drawbox=x=300:y=922:w=1320:h=100:color=black@0.9:t=fill,
             ass=subtitle.ass,
             drawtext=fontfile='../fonts/南宋书局体.ttf':
-               fontcolor=yellow:
-               fontsize=50:
-               text='{weathers}':
-               x=w-mod(230*t\,w+tw):y=0:
-               box=1:boxcolor=black@0.8"
+                fontcolor=yellow:
+                fontsize=50:
+                text='{weathers}':
+                x=w-mod(230*t\,w+tw):y=0:
+                box=1:boxcolor=black@0.8"
                
         -codec:a copy -y {output_final_prefix}tcw.mp4
     
