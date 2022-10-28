@@ -103,8 +103,9 @@ Tube:
             drawtext=fontfile='../fonts/南宋书局体.ttf':text='{date}':
                 fontcolor=#FF122F:fontsize=55:enable='between(t,0,5)':
                 borderw=2:bordercolor=#DCFFFF:
+                box=1:boxcolor=black@0.8:boxborderw=5:
                 x=(w-text_w)/2:y=((h/2 + 2.5*text_h)+105):expansion=none,
-            drawbox=x=300:y=922:w=1320:h=100:color=black@0.9:t=fill,
+            drawbox=x=200:y=922:w=1920-400:h=100:color=black@0.9:t=fill,
             ass=subtitle.ass,
             drawtext=fontfile='../fonts/南宋书局体.ttf':
                 fontcolor=yellow:
@@ -123,9 +124,9 @@ Tube:
         ffmpeg -y {video_duration} -i {output_final_prefix}tcw.mp4 -i {logo} -i Rnews.jpg
         -filter_complex "
             [1:v]colorkey=0xffffff:0.3:0.2[ckout1];
-            [2:v]colorkey=0x00ff00:0.3:0.2[ckout2];
+            [2:v]colorkey=0x00ff00:0.3:0.2,scale=200:100[ckout2];
             [0:v][ckout1]overlay=50:80[out1];
-            [out1][ckout2]overlay=x=-50:y=935[out]" 
+            [out1][ckout2]overlay=x=0:y=925[out]" 
         -map "[out]" -map 0:a:0 -c:a copy {output_final_prefix}tcwl.mp4
     
     # Step 6: Add dynamic dates detail text
