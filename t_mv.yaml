@@ -102,7 +102,7 @@ Tube:
                 box=1:boxcolor=yellow@0.8:boxborderw=5:
                 x=(w-text_w)/2:y=(h/2 + 2.5*text_h):expansion=none,
             drawtext=fontfile='../fonts/南宋书局体.ttf':text='{date}':
-                fontcolor=#FF122F:fontsize=55:enable='between(t,0,5)':
+                fontcolor=#D7FFF8:fontsize=55:enable='between(t,0,5)':
                 borderw=2:bordercolor=#DCFFFF:
                 box=1:boxcolor=black@0.8:boxborderw=5:
                 x=(w-text_w)/2:y=((h/2 + 2.5*text_h)+105):expansion=none,
