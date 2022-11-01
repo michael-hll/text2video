@@ -2,7 +2,7 @@ Variables:
     text2video_root: /volumes/macdrive/projects/text2video
     font_title_color: red
     font_title_bg_color: yellow
-    font_color: yellow
+    font_color: '#FF0607'
     footer_color: '#EDFFE0'
     text_left: 40
     text_top: 40
@@ -48,7 +48,7 @@ GenNewsTitleAndBG:
         ffmpeg -y -i dpics/bg01_hd.png -filter_complex
              "drawbox=
                 x=0:
-                y=120:
+                y=180:
                 color={font_title_bg_color}@1:
                 width=1080:height=150:t=fill,
              drawtext=fontfile='fonts/南宋书局体.ttf':
@@ -57,7 +57,7 @@ GenNewsTitleAndBG:
                 fontsize=100:
                 borderw=6:bordercolor=gray:
                 x=(w-tw)/2:
-                y=140" 
+                y=200" 
             dpics/bg01_hd_title.png
 
 WriteNewsToFile:
@@ -81,7 +81,7 @@ WriteTextToImg:
     # write news content to background
     - COUNT: -f dpics/news.txt -v news_count
     - SET_VAR: curr_line = 0
-    - SET_VAR: fontHeight = 50
+    - SET_VAR: fontHeight = 110
     - SET_VAR: font_size = 90
     - SET_VAR: input = dpics/bg02_hd.png
     - SET_VAR: output = 'tmp' -g
@@ -90,8 +90,8 @@ WriteTextToImg:
         ffmpeg -y -i {output} -vf 
             "drawtext=fontfile='fonts/未央简体.ttf':
             text='{footer}':fontcolor={footer_color}:
-            fontsize={font_size}:
-            borderw=4:bordercolor=black:
+            fontsize={font_size} + 20:
+            borderw=3:bordercolor=#FFF6F6:
             x=(w-tw)/2:
             y={fontHeight} + 150" 
             {output}_footer.jpg
@@ -109,7 +109,7 @@ WriteLineToImage:
                "drawtext=fontfile='fonts/未央简体.ttf':
                 text='{line}':fontcolor={font_color}:
                 fontsize={font_size}:
-                borderw=4:bordercolor=black:
+                borderw=4:bordercolor=#FFF6F6:
                 x=(w-tw)/2:
                 y={fontHeight}" 
                 {output_tmp}
@@ -134,7 +134,7 @@ CropPicsToVideo:
     # combine the bg02_hd_news.png, pics_video.mp4
     - COMMAND: >
          ffmpeg -y -i dpics/bg01_hd_title.png -i dpics/pics_video.mp4 -filter_complex
-            "[1]scale=-1:ih-300,colorkey=0x000000:0.2:0.3[v1];[0][v1]overlay=100:300[out]" 
+            "[1]scale=-1:ih-360,colorkey=0x000000:0.2:0.3[v1];[0][v1]overlay=100:350[out]" 
          -map "[out]" dpics/out.mp4
 
 CROP:
