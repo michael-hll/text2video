@@ -58,6 +58,7 @@ Tube:
     - PATH: {text2video_root}
     - GET_FILE_KEY_VALUE: -f d_apikeys.yaml -g
     - cmd: tube -t t_getHDimgs -fdc -v dcount={dcount} --if {dpics}
+    - break: testing --if no
     
     # # step 2: Split init video into pieces
     # # currently it seems limition be default it could split them into 10 seconds

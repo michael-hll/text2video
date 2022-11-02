@@ -1,0 +1,52 @@
+Variables:
+    t2v: /volumes/macdrive/projects/text2video
+    tmp: /volumes/macdrive/projects/text2video/tmp
+    dpics: /volumes/macdrive/projects/text2video/dpics
+    p2v: yes
+Tube:
+    - cd: {dpics}
+    - run: Pic2V --if p2v
+
+    # write title
+    # write news
+    
+    # 播放视频
+    - cmd: ffplay dpics2.mp4
+
+Pic2V:    
+    - break: testing break --if no
+
+    - set_var: dw = 1000        # delta width
+    - set_var: tw = 1080 + dw   # temp width
+    - cmd: >
+        ffmpeg -y -i bg.png -filter:v 
+        "scale={tw}:1920:force_original_aspect_ratio=increase,crop={tw}:1920" 
+        bg_whd.png
+        --note 把下载的图片调成为 1080+dw:1920 像素
+
+    # 把图片裁成250份，用作frames，稍后用来做动态图片视频
+    - set_var: fcount = 250
+    - set_var: sw = dw/fcount  # slice width
+    - set_var: ls = list(range(0,fcount))
+    - f_del: tmp/*.img
+    - run: CutPic --each i in ls
+
+    # 用前面做出来的250份frames 生成图片动态视频
+    - cmd: ffmpeg -y -r 25 -i tmp/img%03d.jpg dpics2.mp4
+    
+CutPic:
+    - set_var: pic_name_out = 'tmp/img{:03d}.jpg'.format(i)
+    - set_var: x = dw - sw * i
+    - cmd: >
+        ffmpeg -y -i bg_whd.png -filter:v
+        "crop=1080:1920:{x}:0"
+        {pic_name_out}
+
+    
+
+    
+
+
+
+
+        
