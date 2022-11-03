@@ -34,8 +34,23 @@ TUBE:
     - F_DELETE: dpics/pics_video.mp4 
     - F_DELETE: dpics/bg_video.mp4
 
+    # draw title, date
+    - cmd: >
+        ffmpeg -y -i dpics/out.mp4 -filter_complex 
+            "drawtext=fontfile='./fonts/南宋书局体.ttf':text='{title}':
+                fontcolor=white:fontsize=120:enable='between(t,0,2)':
+                borderw=4:bordercolor=#DCFFFF:
+                box=1:boxcolor=black@0.8:boxborderw=5:
+                x=(w-text_w)/2:y=(h/2)-120:expansion=none,
+             drawtext=fontfile='./fonts/南宋书局体.ttf':text='{date}':
+                fontcolor=white:fontsize=100:enable='between(t,0,2)':
+                borderw=4:bordercolor=#DCFFFF:
+                box=1:boxcolor=black@0.8:boxborderw=5:
+                x=(w-text_w)/2:y=(h/2)+20:expansion=none"            
+            -codec:a copy dpics/dpics.mp4
+
     # play
-    - COMMAND: ffplay dpics/out.mp4    
+    - COMMAND: ffplay dpics/dpics.mp4    
 
 GenNewsTitleAndBG:
     # input: bg01.png, {title}, {content}
