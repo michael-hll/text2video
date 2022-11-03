@@ -26,3 +26,5 @@ dpics/news.yaml
 fonts
 fonts.txt
 test.yaml
+slideshow/*.mp4
+slideshow/*.yaml.log

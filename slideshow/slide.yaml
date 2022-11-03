@@ -1,0 +1,68 @@
+# https://www.bannerbear.com/blog/how-to-create-a-slideshow-from-images-with-ffmpeg/
+
+tube:
+    # using command to view all posible pix_fmts: ffmpeg -pix_fmts
+    #- run: Simple
+    #- run: Crossfade
+    #- run: Swipe
+    - run: SwipeCusom
+
+
+Simple:
+    # -framerate 1/3 specifies at what speed FFmpeg should import the images. A framerate of 1/3 means that FFmpeg will display each image for 3 seconds.
+    # -i img%03d.jpg the image sequence to import.
+    # -r 25 the output framerate.
+    - cmd: ffmpeg -y -framerate 1/2 -i bg%02d.jpg -r 25 -c:v libx264 -pix_fmt yuv420p output.mp4
+    - cmd: ffplay output.mp4
+
+Crossfade:
+    # -loop 1 -t 3 -i img001.jpg importing an image with a duration of 3 seconds, and telling FFmpeg to loop the input.
+    # fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+2/TB fading in with a duration of 1 second, applying an offset of N seconds.
+    - cmd: >
+        ffmpeg -y
+            -loop 1 -t 3 -i bg01.jpg 
+            -loop 1 -t 3 -i bg02.jpg 
+            -loop 1 -t 3 -i bg03.jpg 
+            -loop 1 -t 3 -i bg04.jpg 
+            -loop 1 -t 3 -i bg05.jpg 
+        -filter_complex 
+            "[1]fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+2/TB[f0]; 
+            [2]fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+4/TB[f1]; 
+            [3]fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+6/TB[f2]; 
+            [4]fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+8/TB[f3]; 
+            [0][f0]overlay[bg1];[bg1][f1]overlay[bg2];[bg2][f2]overlay[bg3]; 
+            [bg3][f3]overlay,format=yuv420p[v]" 
+        -map "[v]" -r 25 output-crossfade.mp4    
+    - cmd: ffplay output-crossfade.mp4
+
+Swipe:
+    - cmd: >
+        ffmpeg -y
+            -loop 1 -t 3 -i bg01.jpg 
+            -loop 1 -t 3 -i bg02.jpg 
+            -loop 1 -t 3 -i bg03.jpg 
+            -loop 1 -t 3 -i bg04.jpg 
+            -loop 1 -t 3 -i bg05.jpg  
+        -filter_complex 
+            "[0][1]xfade=transition=slideleft:duration=0.5:offset=2.5[f0]; 
+            [f0][2]xfade=transition=slideleft:duration=0.5:offset=5[f1]; 
+            [f1][3]xfade=transition=slideleft:duration=0.5:offset=7.5[f2]; 
+            [f2][4]xfade=transition=slideleft:duration=0.5:offset=10[f3]" 
+        -map "[f3]" -r 25 -pix_fmt yuv420p -vcodec libx264 output-swipe.mp4
+    - cmd: ffplay output-swipe.mp4
+
+SwipeCusom:
+    - cmd: >
+        ffmpeg -y
+            -loop 1 -t 3 -i bg01.jpg 
+            -loop 1 -t 3 -i bg02.jpg 
+            -loop 1 -t 3 -i bg03.jpg 
+            -loop 1 -t 3 -i bg04.jpg 
+            -loop 1 -t 3 -i bg05.jpg 
+        -filter_complex 
+            "[0][1]xfade=transition=circlecrop:duration=0.5:offset=2.5[f0]; 
+            [f0][2]xfade=transition=smoothleft:duration=0.5:offset=5[f1]; 
+            [f1][3]xfade=transition=pixelize:duration=0.5:offset=7.5[f2]; 
+            [f2][4]xfade=transition=hblur:duration=0.5:offset=10[f3]" 
+        -map "[f3]" -r 25 -pix_fmt yuv420p -vcodec libx264 output-swipe-custom.mp4
+    - cmd: ffplay output-swipe-custom.mp4
