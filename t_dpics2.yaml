@@ -1,17 +1,53 @@
 Variables:
-    t2v: /volumes/macdrive/projects/text2video
-    tmp: /volumes/macdrive/projects/text2video/tmp
     dpics: /volumes/macdrive/projects/text2video/dpics
+    font_color: white
+    font_size: 100
+    init_height: 200
     p2v: yes
 Tube:
+    # get dynamic video bg
     - cd: {dpics}
+    - get_keys: -f news.yaml
     - run: Pic2V --if p2v
 
-    # write title
-    # write news
+    # geneate news2.txt file
+    - set_var: news_file = news2.txt
+    - run: WriteNewsToFile -v line_size = 10
+    - f_read: -f {news_file} -v lines
+    - f_del: news2.txt
+
+    # write each news line into video
+    - set_var: input = dpics2temp.mp4
+    - f_cp: -s dpics2.mp4 -d {input}
+    - run: WriteLine2V --each line in lines -v output=temp.mp4
     
-    # 播放视频
-    - cmd: ffplay dpics2.mp4
+    # play output
+    - cmd: ffplay {input}
+
+WriteLine2V:
+    - cmd: >
+        ffmpeg -y -i {input} -vf 
+        "drawtext=fontsize={font_size}:fontcolor={font_color}:
+            fontfile='../fonts/未央简体.ttf':
+            text='{line}':
+            borderw=3:bordercolor=black:
+            x=20:y={init_height}" 
+        {output}
+    - f_cp: -s {output} -d {input}
+    - set_var: init_height = init_height + 1.5 * font_size -g
+
+WriteNewsToFile:
+    - set_var: size = 10
+    - set_var: size = line_size --if line_size != 'line_size'
+    - set_var: i = 0
+    - f_empty: '{news_file} -c'
+    - set_var: loop_times = int(len(content)/size+1)
+    - run: WriteLineToText --while i < loop_times
+
+WriteLineToText:
+    - set_var: line = content[i*size:i*size+size].strip()
+    - write_line: -f {news_file} -v {line} --if len(line) > 0
+    - set_var: i = i + 1 -g
 
 Pic2V:    
     - break: testing break --if no
@@ -32,7 +68,8 @@ Pic2V:
     - run: CutPic --each i in ls
 
     # 用前面做出来的250份frames 生成图片动态视频
-    - cmd: ffmpeg -y -r 25 -i tmp/img%03d.jpg dpics2.mp4
+    - cmd: ffmpeg -y -r 25 -i tmp/img%03d.jpg -pix_fmt yuv420p -vcodec libx264 dpics2.mp4
+    - f_del: tmp/img*.jpg
     
 CutPic:
     - set_var: pic_name_out = 'tmp/img{:03d}.jpg'.format(i)
@@ -41,12 +78,3 @@ CutPic:
         ffmpeg -y -i bg_whd.png -filter:v
         "crop=1080:1920:{x}:0"
         {pic_name_out}
-
-    
-
-    
-
-
-
-
-        
