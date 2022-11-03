@@ -35,7 +35,7 @@ MakeImgHD:
     # horizontal img to horizontal HD
     - set_var: w2hd_result = 0
     - set_var: out = 'bg{j:02d}.jpg'
-    - run: w2hd --if size > 4069 and width >= height -v in_file = {image_name}, out_file = {out}
+    - run: W2HD --if size > 4069 and width >= height -v in_file = {image_name}, out_file = {out}
     - set_var: j = j + 1 -g --if {w2hd_result} == 1 -g
     
 V2HD: 
