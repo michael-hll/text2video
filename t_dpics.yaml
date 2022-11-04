@@ -1,3 +1,4 @@
+# >>> tube -t t_dpics -fdc
 Variables:
     text2video_root: /volumes/macdrive/projects/text2video
     font_title_color: red

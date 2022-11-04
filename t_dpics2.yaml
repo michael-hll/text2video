@@ -1,3 +1,4 @@
+# >>> tube -t t_dpics2 -fdc -v p2v=yes, background=chezhan.png
 Variables:
     dpics: /volumes/macdrive/projects/text2video/dpics
     font_color: white
