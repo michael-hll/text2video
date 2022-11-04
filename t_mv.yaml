@@ -1,3 +1,4 @@
+# >>> tube -t t_mv -v dpics=yes, del=yes, t2v=yes, dcount=2 -fdc
 Variables:
     # debugging used
     video_duration:
