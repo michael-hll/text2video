@@ -10,8 +10,6 @@ Tube:
     - cmd: ffplay {output}
     
 Pic2V:    
-    - break: testing break --if no
-
     - cmd: ffmpeg -y -i {bg} -filter:v 
             "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080" 
            bg_hd.jpg
