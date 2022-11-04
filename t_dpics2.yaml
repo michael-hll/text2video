@@ -2,24 +2,50 @@ Variables:
     dpics: /volumes/macdrive/projects/text2video/dpics
     font_color: white
     font_size: 100
-    init_height: 200
+    title_height: 250
+    init_height: 500
+    delta_height: 100
+    video_height: 1920
+    lines_count: 12
     p2v: yes
+    del: no
 Tube:
     # get dynamic video bg
     - cd: {dpics}
-    - get_keys: -f news.yaml
+    - set: background = beidou.png --if background == 'background'
     - run: Pic2V --if p2v
 
     # geneate news2.txt file
-    - set_var: news_file = news2.txt
-    - run: WriteNewsToFile -v line_size = 10
+    - get_keys: -f news.yaml
+    - set: news_length = len(content)
+    - set: lines_count = int(news_length/100 * 5)
+    - set: lines_count = 12 --if lines_count < 12
+    - set: line_size = math.ceil(news_length / lines_count)
+    - set: delta_height = int((video_height - 1.5*init_height)/lines_count)
+    - set: font_size = math.ceil((1080-200)/(line_size))
+    - set: font_size = 100 --if font_size > 100
+    - set: news_file = news2.txt
+    - run: WriteNewsToFile
     - f_read: -f {news_file} -v lines
-    - f_del: news2.txt
+    - f_del: news2.txt --if del
 
     # write each news line into video
-    - set_var: input = dpics2temp.mp4
+    - set: input = dpics2temp.mp4
     - f_cp: -s dpics2.mp4 -d {input}
-    - run: WriteLine2V --each line in lines -v output=temp.mp4
+    - set: output = temp.mp4
+    - run: WriteLine2V --each line in lines
+
+    # write title
+    - cmd: >
+        ffmpeg -y -i {input} -vf 
+        "drawtext=fontsize=125:fontcolor=red:
+            fontfile='../fonts/未央简体.ttf':
+            text='{title}':
+            borderw=5:bordercolor=white:
+            box=1:boxcolor=#FFFE11@0.8:boxborderw=5:
+            x=(w-text_w)/2:y={title_height}" 
+        {output}
+    - f_cp: -s {output} -d {input}
     
     # play output
     - cmd: ffplay {input}
@@ -30,11 +56,12 @@ WriteLine2V:
         "drawtext=fontsize={font_size}:fontcolor={font_color}:
             fontfile='../fonts/未央简体.ttf':
             text='{line}':
-            borderw=3:bordercolor=black:
-            x=20:y={init_height}" 
+            borderw=5:bordercolor=black:
+            x=(w-text_w)/2:y={init_height}:
+            expansion=none" 
         {output}
     - f_cp: -s {output} -d {input}
-    - set_var: init_height = init_height + 1.5 * font_size -g
+    - set_var: init_height = init_height + delta_height -g
 
 WriteNewsToFile:
     - set_var: size = 10
@@ -55,7 +82,7 @@ Pic2V:
     - set_var: dw = 1000        # delta width
     - set_var: tw = 1080 + dw   # temp width
     - cmd: >
-        ffmpeg -y -i bg.png -filter:v 
+        ffmpeg -y -i {background} -filter:v 
         "scale={tw}:1920:force_original_aspect_ratio=increase,crop={tw}:1920" 
         bg_whd.png
         --note 把下载的图片调成为 1080+dw:1920 像素
