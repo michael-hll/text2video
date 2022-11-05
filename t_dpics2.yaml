@@ -9,7 +9,7 @@ Variables:
     video_height: 1920
     lines_count: 12
     p2v: yes
-    del: no
+    del: yes
 Tube:
     # get dynamic video bg
     - cd: {dpics}
