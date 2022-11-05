@@ -1,0 +1,50 @@
+Variables:
+    t2v: /volumes/macdrive/projects/text2video
+    tmp: /volumes/macdrive/projects/text2video/tmp
+    dpics: /volumes/macdrive/projects/text2video/dpics
+    secs: 1
+    dh: 5 # delta height pixes
+    bg: beidou.png
+    output: dpics4.mp4
+    width: 1920
+    height: 1080
+Tube:
+    - cd: dpics 
+    - run: Pic2V
+    - cmd: ffplay {output}
+    
+Pic2V:    
+
+    # crop the image to width:height
+    - cmd: ffmpeg -y -i {bg} -filter:v 
+            "scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height}" 
+           bg_hd.jpg
+
+    # get total frames
+    - set: fcount = secs * 25    
+    - set: ls = list(range(1,fcount+1))
+    - set: iw = 120 # initial width
+    - set: dx = (width-iw)/2/fcount # delta x
+    - set: cx = (width-iw)/2 # cut x
+    - f_del: tmp/*.img
+    - run: CutPic --each i in ls
+
+    # make video base on frames
+    - cmd: ffmpeg -y -r 25 -i tmp/img%03d.jpg -pix_fmt yuv420p -vcodec libx264 {output}
+    - f_del: tmp/img*.jpg
+    - f_del: bg_hd.jpg
+    
+CutPic:
+    - set: pic_name_out = 'tmp/img{:03d}.jpg'.format(i)
+    - set: cx = cx - dx
+    - set: cw = (width/2-cx) * 2
+    - cmd: 
+        ffmpeg -y -i bg_hd.jpg -filter:v 
+            "crop={cw}:{height}:{cx}:0,pad={width}:{height}:-1:-1:color=0x00ff00"
+        {pic_name_out}
+    
+
+
+
+
+        
