@@ -1,0 +1,56 @@
+Variables:
+    t2v: /volumes/macdrive/projects/text2video
+    tmp: /volumes/macdrive/projects/text2video/tmp
+    dpics: /volumes/macdrive/projects/text2video/dpics
+    secs: 2
+    dh: 5 # delta height pixes
+    bg: beidou.png
+    output: dpics4.mp4
+    width: 1920
+    height: 1080
+    bg01: dpics/bg01.png
+    seconds: 10
+    bg01v: yes
+Tube:
+    - cd: {dpics}
+    - get_keys: -f news.yaml
+    - cd: {t2v}
+    # bg01 to video
+    - cmd: >
+        ffmpeg -y -i {bg01} -filter:v 
+            "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" 
+        dpics/bg01_hd.jpg 
+        --if bg01v
+    
+    - cmd: >
+        ffmpeg -y -loop 1 -i dpics/bg01_hd.jpg 
+            -c:v libx264 -t {seconds} -pix_fmt yuv420p 
+        dpics/bg01_hdv.mp4
+        --if bg01v
+    
+    - cmd: ffplay dpics/bg01_hdv.mp4 --if bg01v
+    
+    # get news
+    - set: txtoutput = mynews.txt
+    - cmd: tube -t util/WriteCont2TXT.yaml -fc -v content={content}, output={txtoutput}
+    # write news text to bg01_text.
+    - cd: {dpics}
+    - cmd: >
+        ffmpeg -y -i bg_green.jpg -vf 
+            "drawtext=fontfile='../fonts/南宋书局体.ttf':
+                textfile='{txtoutput}':
+                fontsize=80:
+                fontcolor=red@1:
+                borderw=4:bordercolor=white:
+                alpha=1:
+                x=(w-tw)/2:
+                y=(h-th)/2"
+            bg01_text.jpg
+    - cmd: ffplay bg01_text.jpg --if no
+    # pic with text to video
+    - cd: {t2v}
+    - cmd: tube -t util/P2VOpenDoor -fdc 
+                -v bg=bg01_text.jpg, secs=1, output=OpenDoor.mp4, play=yes
+
+    - cd: {dpics}
+    - f_del: bg01*.jpg
