@@ -1,0 +1,24 @@
+Variables:
+    work: /volumes/macdrive/projects/text2video/dpics
+    content: test
+    lines_count: 10
+    output: output.txt
+
+Tube:
+    - cd: {work}
+    - set: content_len = len(content)
+    # calc lines count
+    - set: lines_count = int(content_len/100 * 5)
+    - set: lines_count = 5 --if lines_count < 5
+    # calc lines size: the ount of fonts in one line
+    - set: line_size = math.ceil(content_len / lines_count)
+
+    # write each line to text file
+    - f_empty: '{output} -c'
+    - set: i = 0
+    - run: WriteLineToText --while i < lines_count
+
+WriteLineToText:
+    - set: line = content[i*line_size:i*line_size+line_size].strip()
+    - write_ln: -f {output} -v {line} --if len(line) > 0
+    - set: i = i + 1 -g
