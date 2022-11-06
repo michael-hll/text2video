@@ -1,3 +1,4 @@
+# Example: - cmd: tube -t util/WriteCont2TXT.yaml -fc -v content={content}, output=mynews.txt
 Variables:
     work: /volumes/macdrive/projects/text2video/dpics
     content: test
