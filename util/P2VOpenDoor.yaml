@@ -1,11 +1,8 @@
 Variables:
-    t2v: /volumes/macdrive/projects/text2video
-    tmp: /volumes/macdrive/projects/text2video/tmp
     dpics: /volumes/macdrive/projects/text2video/dpics
-    secs: 2
-    dh: 5 # delta height pixes
-    bg: beidou.png
-    output: dpics4.mp4
+    secs: 1
+    bg: bg_green.jpg
+    output: OpenDoor.mp4
     width: 1920
     height: 1080
     play: no
@@ -13,9 +10,8 @@ Tube:
     - cd: {dpics}
     - run: Pic2V
     - cmd: ffplay {output} --if play
-    
-Pic2V:    
 
+Pic2V:    
     # crop the image to width:height
     - cmd: ffmpeg -y -i {bg} -filter:v 
             "scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height}" 
