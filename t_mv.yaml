@@ -30,13 +30,13 @@ Variables:
     # input parameters
     t2v: yes # If re-generate the 'video_init.mp4'   
     dpics: yes # if download pictures
-    del: yes # if delete temp files
+    delete: yes # if delete temp files
     dcount: 3
 Tube:
     # step 1: Get 'video_init.mp4' and backgournd pictures
     - PATH: {downloads}
-    - COMMAND: rm 未命名*.mp4 --continue --if {del}
-    - COMMAND: rm *.ass --continue --if {del}
+    - COMMAND: rm 未命名*.mp4 --continue --if {delete}
+    - COMMAND: rm *.ass --continue --if {delete}
     - PATH: {text2video_root}
     - GET_FILE_KEY_VALUE: -f ./d_article.yaml -g
     - COMMAND: python3 s_t2v.py ./d_article.yaml --if {t2v}
@@ -73,7 +73,7 @@ Tube:
     - PATH: {text2video_root}
     - COMMAND: python3 s_pv.py ./tmp
     - PATH: '{text2video_root}/tmp/default-bg'
-    - COMMAND: rm *.* --continue --if {dpics} {del}
+    - COMMAND: rm *.* --continue --if {dpics} {delete}
 
     # # step 4: Add title, captions, weathers
     - PATH: {text2video_root}
@@ -282,9 +282,9 @@ Tube:
     # # Step 7: Genearte the final one and clean
     - PATH: '{text2video_root}/tmp'
     - COMMAND: cp -f {output_final_prefix}tl2_dates2.mp4  {output_final}
-    - COMMAND: rm -f video_init_*.mp4 --continue --if {del}
-    - COMMAND: rm -f video_final_*.mp4 --continue --if {del}
-    - COMMAND: rm d_filelist.txt --continue --if {del}
+    - COMMAND: rm -f video_init_*.mp4 --continue --if {delete}
+    - COMMAND: rm -f video_final_*.mp4 --continue --if {delete}
+    - COMMAND: rm d_filelist.txt --continue --if {delete}
     - COMMAND: ffplay {output_final}
 
 WaitngDownload:

@@ -9,7 +9,7 @@ Variables:
     video_height: 1920
     lines_count: 12
     p2v: yes
-    del: yes
+    delete: yes
 Tube:
     # get dynamic video bg
     - cd: {dpics}
@@ -28,7 +28,7 @@ Tube:
     - set: news_file = news2.txt
     - run: WriteNewsToFile
     - f_read: -f {news_file} -v lines
-    - f_del: news2.txt --if del
+    - f_del: news2.txt --if delete
 
     # write each news line into video
     - set: input = dpics2temp.mp4
