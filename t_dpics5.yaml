@@ -10,12 +10,12 @@ Variables:
     height: 1080
     bg01: dpics/bg01.png
     seconds: 10
-    bg01v: yes
+    bg01v: no
 Tube:
     - cd: {dpics}
     - get_keys: -f news.yaml
     - cd: {t2v}
-    # bg01 to video
+    # bg01 to seconds video
     - cmd: >
         ffmpeg -y -i {bg01} -filter:v 
             "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" 
@@ -30,27 +30,71 @@ Tube:
     
     - cmd: ffplay dpics/bg01_hdv.mp4 --if bg01v
     
-    # get news
-    - set: txtoutput = mynews.txt
-    - cmd: tube -t util/WriteCont2TXT.yaml -fc -v content={content}, output={txtoutput}
-    # write news text to bg01_text.
+    # get news part 1
+    - set: txtoutput = mynews1.txt
+    - cmd: tube util/WriteCont2TXT.yaml -fc -v content={content}, output={txtoutput}
+    # write news text to bg01_text1.jpg
     - cd: {dpics}
     - cmd: >
         ffmpeg -y -i bg_green.jpg -vf 
-            "drawtext=fontfile='../fonts/南宋书局体.ttf':
-                textfile='{txtoutput}':
-                fontsize=80:
-                fontcolor=red@1:
-                borderw=4:bordercolor=white:
-                alpha=1:
-                x=(w-tw)/2:
-                y=(h-th)/2"
-            bg01_text.jpg
-    - cmd: ffplay bg01_text.jpg --if no
-    # pic with text to video
+            "drawtext=fontfile='../fonts/南宋书局体.ttf'
+                :textfile='{txtoutput}'
+                :fontsize=80:fontcolor=red@1:
+                :borderw=4:bordercolor=white
+                :alpha=1
+                :box=1:boxcolor=black@0.2
+                :line_spacing=15
+                :x=(w-tw)/2
+                :y=(h-th)/2"
+            bg01_text1.jpg
+    - cmd: ffplay bg01_text1.jpg --if no
+    # pic with text to video OpenDoor1.mp4
     - cd: {t2v}
-    - cmd: tube -t util/P2VOpenDoor -fdc 
-                -v bg=bg01_text.jpg, secs=1, output=OpenDoor.mp4, play=yes
+    - cmd: tube util/P2VOpenDoor -fdc 
+           -v bg=bg01_text1.jpg, secs=2, output=OpenDoor1.mp4, play=no
+    
+    # get news part 2
+    - set: txtoutput = mynews2.txt
+    - cmd: tube util/WriteCont2TXT.yaml -fc -v content={content2}, output={txtoutput}
+    # write news text to bg01_text1.jpg
+    - cd: {dpics}
+    - cmd: >
+        ffmpeg -y -i bg_green.jpg -vf 
+            "drawtext=fontfile='../fonts/南宋书局体.ttf'
+                :textfile='{txtoutput}'
+                :fontsize=80:fontcolor=red@1:
+                :borderw=4:bordercolor=white
+                :alpha=1
+                :box=1:boxcolor=black@0.2
+                :line_spacing=15
+                :x=(w-tw)/2
+                :y=(h-th)/2"
+            bg01_text2.jpg
+    - cmd: ffplay bg01_text2.jpg --if no
+    # pic with text to video OpenDoor1.mp4
+    - cd: {t2v}
+    - cmd: tube util/P2VOpenDoor -fdc 
+           -v bg=bg01_text2.jpg, secs=2, output=OpenDoor2.mp4, play=no
+
+    # small bg02, bg03
+    - cmd: tube util/P2VZoomIn -fdc -v bg=beijing.png, play=no, output=bg02v.mp4 --if no
+    - cmd: tube util/P2VZoomIn -fdc -v bg=shanghai.png, play=no, output=bg03v.mp4 --if no
+
+    # Add OpenDoor1.mp4, OpenDoor2.mp4 to bg01_hdv.mp4
+    - cd: {dpics}
+    - cmd: >
+        ffmpeg -y -i bg01_hdv.mp4 -i OpenDoor1.mp4 -i OpenDoor2.mp4 -i bg02v.mp4 -i bg03v.mp4
+             -filter_complex
+            "[1]colorkey=0x00ff00:0.3:0.2,scale=1080:-1[1v];
+             [2]setpts=PTS-STARTPTS+5.2/TB,colorkey=0x00ff00:0.3:0.2,scale=1080:-1[2v];
+             [3]scale=1080:-1[3v];
+             [4]setpts=PTS-STARTPTS+5.2/TB,scale=1080:-1[4v];
+             [0][1v]overlay=x=0:y=350:enable='between(t\,0,5)'[0v];
+             [0v][2v]overlay=x=0:y=350:enable='between(t\,5.2,10)'[0v1];
+             [0v1][3v]overlay=x=0:y=850:enable='between(t\,0,5)'[0v2];
+             [0v2][4v]overlay=x=0:y=850:enable='between(t\,5.2,10)'[out]"
+        -map "[out]" -c:a copy bg01_hdv_draft.mp4
+    - cmd: ffplay bg01_hdv_draft.mp4            
 
     - cd: {dpics}
-    - f_del: bg01*.jpg
+    - f_del: bg01*.jpg --if no

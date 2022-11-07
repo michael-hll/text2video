@@ -20,7 +20,7 @@ Pic2V:
     # get total frames
     - set: fcount = secs * 25    
     - set: ls = list(range(1,fcount+1))
-    - set: iw = 120 # initial width
+    - set: iw = 0 # initial width
     - set: dx = (width-iw)/2/fcount # delta x
     - set: cx = (width-iw)/2 # cut x
     - f_del: tmp/*.img
