@@ -44,17 +44,14 @@ Tube:
     - RUN_TUBE: WaitngDownload -w {downloaded} == no --if {t2v}
     - PATH: {downloads}
     # get video download file name
-    - COMMAND: ls -tr ./*.mp4 | tail -1 | awk -F '/' '{print "vname="$NF}' > video_init_name.txt --if {t2v}
-    # get subtitle file name
-    - COMMAND: ls -tr ./*.ass | tail -1 | awk -F '/' '{print "cname="$NF}' > caption_init_name.txt --if {t2v}
-    - PAUSE: 0.05
-    # load video name and caption init name to variables
-    - GET_FILE_KEY_VALUE: -f video_init_name.txt --if {t2v} -g
-    - GET_FILE_KEY_VALUE: -f caption_init_name.txt --if {t2v} -g
+    - list_f: -d *.ass -s atime desc -v cfiles
+    - list_f: -d *.mp4 -s atime desc -v vfiles
+    - set: vname = vfiles[0]
+    - set: cname = cfiles[0]
     - PATH: {text2video_root}
     - COMMAND: mkdir -p ./tmp
-    - COMMAND: cp -f '{downloads}/{vname}' {text2video_root}/tmp/video_init.mp4  --if {t2v}
-    - COMMAND: cp -f '{downloads}/{cname}' {text2video_root}/tmp/subtitle.ass  --if {t2v}
+    - f_cp: -s {downloads}/{vname} -d {text2video_root}/tmp/video_init.mp4 --if len(vfiles) > 0
+    - f_cp: -s {downloads}/{cname} -d {text2video_root}/tmp/subtitle.ass --if len(cfiles) > 0
     # get backgournd images
     - PATH: {text2video_root}
     - GET_FILE_KEY_VALUE: -f d_apikeys.yaml -g
