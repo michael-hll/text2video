@@ -82,7 +82,6 @@ Tube:
     - PATH: {text2video_root}
     - COMMAND: python3 s_weathers.py {HEFENG_API_KEY} 'shenzhen,shanghai,beijing' d_weathers.txt 12
     - GET_FILE_KEY_VALUE: -f d_weathers.txt
-    - FILE_READ: -f d_news.txt -v news -g
     - set_var: date = datetime.now().strftime("%Y年%m月%d日")
     - PATH: '{text2video_root}/tmp'
     # adjust subtitle font size and color
