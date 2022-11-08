@@ -15,7 +15,7 @@ Tube:
     - set_var: j = 0
     - F_DELETE: bg*.jpg
     - F_DELETE: img*.log
-    - run: MakeImgHD --while i < img_count
+    - run: MakeImgHD --while i < img_count --key
     - F_DELETE: img*.log
     - F_DELETE: img*.log
 
@@ -29,7 +29,7 @@ MakeImgHD:
     # vertical img to horizontal HD 
     - set_var: v2hd_result = 0      
     - set_var: out = 'bg{j:02d}.jpg'  
-    - run: v2hd --if size > 4096 and width < height -v in_file = {image_name}, out_file = {out}
+    - run: V2HD --if size > 4096 and width < height -v in_file = {image_name}, out_file = {out}
     - set_var: j = j + 1 -g --if {v2hd_result} == 1 -g
 
     # horizontal img to horizontal HD

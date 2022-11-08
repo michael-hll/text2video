@@ -28,10 +28,10 @@ Variables:
     color_green: green
     color_black: black
     # input parameters
-    t2v: yes # If re-generate the 'video_init.mp4'   
+    t2v: no # If re-generate the 'video_init.mp4'   
     dpics: yes # if download pictures
     delete: yes # if delete temp files
-    dcount: 3
+    dcount: 2
 Tube:
     # step 1: Get 'video_init.mp4' and backgournd pictures
     - PATH: {downloads}
@@ -50,8 +50,8 @@ Tube:
     - set: cname = cfiles[0]
     - PATH: {text2video_root}
     - COMMAND: mkdir -p ./tmp
-    - f_cp: -s {downloads}/{vname} -d {text2video_root}/tmp/video_init.mp4 --if len(vfiles) > 0
-    - f_cp: -s {downloads}/{cname} -d {text2video_root}/tmp/subtitle.ass --if len(cfiles) > 0
+    - f_cp: -s {downloads}/{vname} -d {text2video_root}/tmp/video_init.mp4 --if len(vfiles) > 0 --if {t2v}
+    - f_cp: -s {downloads}/{cname} -d {text2video_root}/tmp/subtitle.ass --if len(cfiles) > 0 --if {t2v}
     # get backgournd images
     - PATH: {text2video_root}
     - GET_FILE_KEY_VALUE: -f d_apikeys.yaml -g
