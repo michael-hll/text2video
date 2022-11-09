@@ -143,6 +143,7 @@ Tube:
         {output}   
     - cmd: ffplay {output}    
 
+    # clean
     - cd: {dpics}
     - f_del: bg01*.jpg --if yes
     - f_del: mynews*.txt --if yes
