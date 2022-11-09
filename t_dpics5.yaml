@@ -17,6 +17,7 @@ Variables:
     # general
     output: dpics5.mp4
     news_font: ../fonts/世界终结.otf
+    play: no
 Tube:
     - cd: {dpics}
     - get_keys: -f {news}
@@ -33,7 +34,7 @@ Tube:
         bg01_hdv.mp4
         --if bg01v
     
-    - cmd: ffplay bg01_hdv.mp4 --if no
+    - cmd: ffplay bg01_hdv.mp4 --if {play}
     
     # get news part 1
     - cd: {dpics}
@@ -42,36 +43,38 @@ Tube:
     # write news text to bg01_text1.jpg
     - cd: {dpics}
     - cmd: >
-        ffmpeg -y -i bg_green.jpg -vf 
-            "drawtext=fontfile='{news_font}'
+        ffmpeg -y -i bg_green.jpg -vf "            
+            drawtext=fontfile='{news_font}'
                 :textfile='{txtoutput}'
                 :fontsize=85:fontcolor=white@1:
                 :borderw=2:bordercolor=black
                 :alpha=1
-                :box=1:boxcolor=black@0.2
+                :box=1:boxcolor=6B6B6B@0
                 :line_spacing=15
                 :x=(w-tw)/2
                 :y=(h-th)/2"
             bg01_text1.jpg
-    - cmd: ffplay bg01_text1.jpg --if no
+    - cmd: ffplay bg01_text1.jpg --if {play}
     # pic with text to video OpenDoor1.mp4
     - cd: {dpics}
     - cmd: tube ../util/P2VOpenDoor -fdc 
-           -v bg=bg01_text1.jpg, secs=2, output=OpenDoor1.mp4, play=no
+           -v bg=bg01_text1.jpg, secs=2, output=OpenDoor1.mp4, play={play}
     
+    - break: --if no
+
     # get news part 2
     - set: txtoutput = mynews2.txt
     - cmd: tube ../util/WriteCont2TXT.yaml -fc -v content={content2}, output={txtoutput}
     # write news text to bg01_text1.jpg
     - cd: {dpics}
     - cmd: >
-        ffmpeg -y -i bg_green.jpg -vf 
-            "drawtext=fontfile='{news_font}'
+        ffmpeg -y -i bg_green.jpg -vf "
+            drawtext=fontfile='{news_font}'
                 :textfile='{txtoutput}'
                 :fontsize=85:fontcolor=white@1:
                 :borderw=2:bordercolor=black
                 :alpha=1
-                :box=1:boxcolor=black@0.2
+                :box=1:boxcolor=#6B6B6B@0
                 :line_spacing=15
                 :x=(w-tw)/2
                 :y=(h-th)/2"
@@ -84,15 +87,15 @@ Tube:
 
     # small bg02, bg03
     - cd: {dpics}
-    - cmd: tube ../util/P2VZoomIn -fdc -v bg={bg02}, play=no, output=bg02v.mp4 --if yes
-    - cmd: tube ../util/P2VZoomIn -fdc -v bg={bg03}, play=no, output=bg03v.mp4 --if yes
+    - cmd: tube ../util/P2VZoomIn -fdc -v bg={bg02}, play={play}, output=bg02v.mp4 --if yes
+    - cmd: tube ../util/P2VZoomIn -fdc -v bg={bg03}, play={play}, output=bg03v.mp4 --if yes
 
     # Add OpenDoor1.mp4, OpenDoor2.mp4, bg02v.mp4, bg03v.mp4 to bg01_hdv.mp4
     - cd: {dpics}
     - cmd: >
         ffmpeg -y -i bg01_hdv.mp4 -i OpenDoor1.mp4 -i OpenDoor2.mp4 -i bg02v.mp4 -i bg03v.mp4
-             -filter_complex
-            "[1]colorkey=0x00ff00:0.3:0.2,scale=1080:-1[1v];
+             -filter_complex "             
+             [1]colorkey=0x00ff00:0.3:0.2,scale=1080:-1[1v];
              [2]setpts=PTS-STARTPTS+5.2/TB,colorkey=0x00ff00:0.3:0.2,scale=1080:-1[2v];
              [3]scale=1080:-1[3v];
              [4]setpts=PTS-STARTPTS+5.2/TB,scale=1080:-1[4v];
@@ -101,7 +104,7 @@ Tube:
              [0v1][3v]overlay=x=0:y=900:enable='between(t\,0,5)'[0v2];
              [0v2][4v]overlay=x=0:y=900:enable='between(t\,5.2,10.2)'[out]"
         -map "[out]" -c:a copy bg01_hdv_draft.mp4
-    - cmd: ffplay bg01_hdv_draft.mp4 --if no
+    - cmd: ffplay bg01_hdv_draft.mp4 --if {play}
 
     # Add title, subtitle to bg01_hkv_draft.mp4
     - cd: {dpics}
@@ -143,7 +146,7 @@ Tube:
                 :y=1800"
         -c:a copy
         {output}   
-    - cmd: ffplay {output}    
+    - cmd: ffplay {output} --if yes  
 
     # clean
     - cd: {dpics}
