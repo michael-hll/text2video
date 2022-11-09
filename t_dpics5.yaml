@@ -42,10 +42,10 @@ Tube:
     - cd: {dpics}
     - cmd: >
         ffmpeg -y -i bg_green.jpg -vf 
-            "drawtext=fontfile='../fonts/味觉字体.ttf'
+            "drawtext=fontfile='../fonts/世界终结.otf'
                 :textfile='{txtoutput}'
-                :fontsize=80:fontcolor=red@1:
-                :borderw=2:bordercolor=white
+                :fontsize=80:fontcolor=white@1:
+                :borderw=2:bordercolor=black
                 :alpha=1
                 :box=1:boxcolor=black@0.2
                 :line_spacing=15
@@ -65,10 +65,10 @@ Tube:
     - cd: {dpics}
     - cmd: >
         ffmpeg -y -i bg_green.jpg -vf 
-            "drawtext=fontfile='../fonts/南宋书局体.ttf'
+            "drawtext=fontfile='../fonts/世界终结.otf'
                 :textfile='{txtoutput}'
-                :fontsize=80:fontcolor=red@1:
-                :borderw=4:bordercolor=white
+                :fontsize=80:fontcolor=white@1:
+                :borderw=2:bordercolor=black
                 :alpha=1
                 :box=1:boxcolor=black@0.2
                 :line_spacing=15
@@ -95,9 +95,9 @@ Tube:
              [3]scale=1080:-1[3v];
              [4]setpts=PTS-STARTPTS+5.2/TB,scale=1080:-1[4v];
              [0][1v]overlay=x=0:y=350:enable='between(t\,0,5)'[0v];
-             [0v][2v]overlay=x=0:y=350:enable='between(t\,5.2,10)'[0v1];
+             [0v][2v]overlay=x=0:y=350:enable='between(t\,5.2,10.2)'[0v1];
              [0v1][3v]overlay=x=0:y=900:enable='between(t\,0,5)'[0v2];
-             [0v2][4v]overlay=x=0:y=900:enable='between(t\,5.2,10)'[out]"
+             [0v2][4v]overlay=x=0:y=900:enable='between(t\,5.2,10.2)'[out]"
         -map "[out]" -c:a copy bg01_hdv_draft.mp4
     - cmd: ffplay bg01_hdv_draft.mp4 --if no
 
@@ -122,7 +122,23 @@ Tube:
                 :borderw=0:bordercolor=#FFFFFF
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=360"
+                :y=360,
+            drawtext=fontfile='../fonts/世界终结.otf'
+                :text='{footer}'
+                :fontsize=60
+                :fontcolor=white@1
+                :borderw=0:bordercolor=#FF0000
+                :alpha='1'
+                :x=(w-tw)/2
+                :y=1720,
+            drawtext=fontfile='../fonts/世界终结.otf'
+                :text='{date}'
+                :fontsize=50
+                :fontcolor=white@1
+                :borderw=0:bordercolor=#FF0000
+                :alpha='1'
+                :x=(w-tw)/2
+                :y=1800"
         -c:a copy
         {output}   
     - cmd: ffplay {output}    
