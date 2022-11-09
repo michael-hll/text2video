@@ -13,6 +13,7 @@ Tube:
     - set: font_size = 30
     - run: DrawLine2Pic --each i, font in font_ls
     - cmd: ffplay {bg_new}
+    - f_del: bg_*temp*.jpg
 
 DrawLine2Pic:
     - set: font_short = font[0:11]
@@ -21,8 +22,8 @@ DrawLine2Pic:
             "drawtext=fontfile='../fonts/{font}'
                 :text='{font_short}'
                 :fontsize={font_size}
-                :fontcolor=white@1
-                :borderw=2:bordercolor=#FF0000
+                :fontcolor=black@1
+                :borderw=0.5:bordercolor=white
                 :alpha='1'
                 :x={font_x}
                 :y={font_y}"

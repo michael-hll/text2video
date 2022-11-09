@@ -42,10 +42,10 @@ Tube:
     - cd: {dpics}
     - cmd: >
         ffmpeg -y -i bg_green.jpg -vf 
-            "drawtext=fontfile='../fonts/南宋书局体.ttf'
+            "drawtext=fontfile='../fonts/味觉字体.ttf'
                 :textfile='{txtoutput}'
                 :fontsize=80:fontcolor=red@1:
-                :borderw=4:bordercolor=white
+                :borderw=2:bordercolor=white
                 :alpha=1
                 :box=1:boxcolor=black@0.2
                 :line_spacing=15
@@ -96,26 +96,37 @@ Tube:
              [4]setpts=PTS-STARTPTS+5.2/TB,scale=1080:-1[4v];
              [0][1v]overlay=x=0:y=350:enable='between(t\,0,5)'[0v];
              [0v][2v]overlay=x=0:y=350:enable='between(t\,5.2,10)'[0v1];
-             [0v1][3v]overlay=x=0:y=850:enable='between(t\,0,5)'[0v2];
-             [0v2][4v]overlay=x=0:y=850:enable='between(t\,5.2,10)'[out]"
+             [0v1][3v]overlay=x=0:y=900:enable='between(t\,0,5)'[0v2];
+             [0v2][4v]overlay=x=0:y=900:enable='between(t\,5.2,10)'[out]"
         -map "[out]" -c:a copy bg01_hdv_draft.mp4
     - cmd: ffplay bg01_hdv_draft.mp4 --if no
 
     # Add title, subtitle to bg01_hkv_draft.mp4
     - cd: {dpics}
     - cmd: >
-        ffmpeg -y -i bg01_hdv_draft.mp4 -filter_complex
-            "drawtext=fontfile='../fonts/因果.otf'
+        ffmpeg -y -i bg01_hdv_draft.mp4 -filter_complex "
+            drawbox=x=0:y=350:color=#FFD700@1:
+                width=1080:height=80:t=fill,
+            drawtext=fontfile='../fonts/世界终结.otf'
                 :text='{title}'
                 :fontsize=100
                 :fontcolor=white@1
-                :borderw=8:bordercolor=#FF0000
+                :borderw=4:bordercolor=#FF0000
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=100"
+                :y=250,
+            drawtext=fontfile='../fonts/世界终结.otf'
+                :text='{subtitle}'
+                :fontsize=90
+                :fontcolor=black@1
+                :borderw=0:bordercolor=#FFFFFF
+                :alpha='1'
+                :x=(w-tw)/2
+                :y=360"
         -c:a copy
         {output}   
     - cmd: ffplay {output}    
 
     - cd: {dpics}
-    - f_del: bg01*.jpg --if no
+    - f_del: bg01*.jpg --if yes
+    - f_del: mynews*.txt --if yes

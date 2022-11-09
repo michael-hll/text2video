@@ -22,6 +22,7 @@ tmp.txt
 dpics/*.mp4
 dpics/*.png
 dpics/news.yaml
+dpics/bg_green_new.jpg
 .vscode
 fonts
 fonts.txt
