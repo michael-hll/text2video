@@ -1,19 +1,24 @@
 Variables:
     t2v: /volumes/macdrive/projects/text2video
-    tmp: /volumes/macdrive/projects/text2video/tmp
-    dpics: /volumes/macdrive/projects/text2video/dpics
-    secs: 2
-    dh: 5 # delta height pixes
-    bg: beidou.png
-    output: dpics4.mp4
+    dpics: /volumes/macdrive/projects/text2video/dpics  
+    # big background    
     width: 1920
     height: 1080
-    bg01: dpics/bg01.png
-    seconds: 10
+    bg01: dpics/bg01.png    
     bg01v: no
+    seconds: 10
+    # upper news
+    news: news.yaml
+    secs: 2
+    # lower smal backgrounds
+    bg02: beijing.png
+    bg03: shanghai.png
+    dh: 5 # delta height pixes
+    # general
+    output: dpics5.mp4
 Tube:
     - cd: {dpics}
-    - get_keys: -f news.yaml
+    - get_keys: -f {news}
     - cd: {t2v}
     # bg01 to seconds video
     - cmd: >
@@ -71,16 +76,16 @@ Tube:
                 :y=(h-th)/2"
             bg01_text2.jpg
     - cmd: ffplay bg01_text2.jpg --if no
-    # pic with text to video OpenDoor1.mp4
+    # pic with text to video OpenDoor2.mp4
     - cd: {t2v}
     - cmd: tube util/P2VOpenDoor -fdc 
            -v bg=bg01_text2.jpg, secs=2, output=OpenDoor2.mp4, play=no
 
     # small bg02, bg03
-    - cmd: tube util/P2VZoomIn -fdc -v bg=beijing.png, play=no, output=bg02v.mp4 --if no
-    - cmd: tube util/P2VZoomIn -fdc -v bg=shanghai.png, play=no, output=bg03v.mp4 --if no
+    - cmd: tube util/P2VZoomIn -fdc -v bg={bg02}, play=no, output=bg02v.mp4 --if no
+    - cmd: tube util/P2VZoomIn -fdc -v bg={bg03}, play=no, output=bg03v.mp4 --if no
 
-    # Add OpenDoor1.mp4, OpenDoor2.mp4 to bg01_hdv.mp4
+    # Add OpenDoor1.mp4, OpenDoor2.mp4, bg02v.mp4, bg03v.mp4 to bg01_hdv.mp4
     - cd: {dpics}
     - cmd: >
         ffmpeg -y -i bg01_hdv.mp4 -i OpenDoor1.mp4 -i OpenDoor2.mp4 -i bg02v.mp4 -i bg03v.mp4
@@ -94,7 +99,23 @@ Tube:
              [0v1][3v]overlay=x=0:y=850:enable='between(t\,0,5)'[0v2];
              [0v2][4v]overlay=x=0:y=850:enable='between(t\,5.2,10)'[out]"
         -map "[out]" -c:a copy bg01_hdv_draft.mp4
-    - cmd: ffplay bg01_hdv_draft.mp4            
+    - cmd: ffplay bg01_hdv_draft.mp4 --if no
+
+    # Add title, subtitle to bg01_hkv_draft.mp4
+    - cd: {dpics}
+    - cmd: >
+        ffmpeg -y -i bg01_hdv_draft.mp4 -filter_complex
+            "drawtext=fontfile='../fonts/因果.otf'
+                :text='{title}'
+                :fontsize=100
+                :fontcolor=white@1
+                :borderw=8:bordercolor=#FF0000
+                :alpha='1'
+                :x=(w-tw)/2
+                :y=100"
+        -c:a copy
+        {output}   
+    - cmd: ffplay {output}    
 
     - cd: {dpics}
     - f_del: bg01*.jpg --if no
