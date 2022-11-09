@@ -8,11 +8,11 @@ Variables:
 Tube:
     - cd: {work}
     - set: content_len = len(content)
-    # calc lines count
-    - set: lines_count = int(content_len/100 * 5)
-    - set: lines_count = 5 --if lines_count < 5
     # calc lines size: the ount of fonts in one line
-    - set: line_size = math.ceil(content_len / lines_count)
+    - set: line_size = 20
+    # calc lines count
+    - set: lines_count = int(content_len/line_size) + 1
+    - set: lines_count = 5 --if lines_count < 5
 
     # write each line to text file
     - f_empty: '{output} -c'
