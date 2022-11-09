@@ -17,7 +17,7 @@ Tube:
     # write each line to text file
     - f_empty: '{output} -c'
     - set: i = 0
-    - run: WriteLineToText --while i < lines_count
+    - run: WriteLineToText --while i < lines_count --key
 
 WriteLineToText:
     - set: line = content[i*line_size:i*line_size+line_size].strip()

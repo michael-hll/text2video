@@ -16,6 +16,7 @@ Variables:
     dh: 5 # delta height pixes
     # general
     output: dpics5.mp4
+    news_font: ../fonts/世界终结.otf
 Tube:
     - cd: {dpics}
     - get_keys: -f {news}
@@ -33,7 +34,7 @@ Tube:
         dpics/bg01_hdv.mp4
         --if bg01v
     
-    - cmd: ffplay dpics/bg01_hdv.mp4 --if bg01v
+    - cmd: ffplay dpics/bg01_hdv.mp4 --if no
     
     # get news part 1
     - set: txtoutput = mynews1.txt
@@ -42,9 +43,9 @@ Tube:
     - cd: {dpics}
     - cmd: >
         ffmpeg -y -i bg_green.jpg -vf 
-            "drawtext=fontfile='../fonts/世界终结.otf'
+            "drawtext=fontfile='{news_font}'
                 :textfile='{txtoutput}'
-                :fontsize=80:fontcolor=white@1:
+                :fontsize=90:fontcolor=white@1:
                 :borderw=2:bordercolor=black
                 :alpha=1
                 :box=1:boxcolor=black@0.2
@@ -65,9 +66,9 @@ Tube:
     - cd: {dpics}
     - cmd: >
         ffmpeg -y -i bg_green.jpg -vf 
-            "drawtext=fontfile='../fonts/世界终结.otf'
+            "drawtext=fontfile='{news_font}'
                 :textfile='{txtoutput}'
-                :fontsize=80:fontcolor=white@1:
+                :fontsize=90:fontcolor=white@1:
                 :borderw=2:bordercolor=black
                 :alpha=1
                 :box=1:boxcolor=black@0.2
@@ -82,8 +83,8 @@ Tube:
            -v bg=bg01_text2.jpg, secs=2, output=OpenDoor2.mp4, play=no
 
     # small bg02, bg03
-    - cmd: tube util/P2VZoomIn -fdc -v bg={bg02}, play=no, output=bg02v.mp4 --if no
-    - cmd: tube util/P2VZoomIn -fdc -v bg={bg03}, play=no, output=bg03v.mp4 --if no
+    - cmd: tube util/P2VZoomIn -fdc -v bg={bg02}, play=no, output=bg02v.mp4 --if yes
+    - cmd: tube util/P2VZoomIn -fdc -v bg={bg03}, play=no, output=bg03v.mp4 --if yes
 
     # Add OpenDoor1.mp4, OpenDoor2.mp4, bg02v.mp4, bg03v.mp4 to bg01_hdv.mp4
     - cd: {dpics}
@@ -107,7 +108,7 @@ Tube:
         ffmpeg -y -i bg01_hdv_draft.mp4 -filter_complex "
             drawbox=x=0:y=350:color=#FFD700@1:
                 width=1080:height=80:t=fill,
-            drawtext=fontfile='../fonts/世界终结.otf'
+            drawtext=fontfile='{news_font}'
                 :text='{title}'
                 :fontsize=100
                 :fontcolor=white@1
@@ -115,7 +116,7 @@ Tube:
                 :alpha='1'
                 :x=(w-tw)/2
                 :y=250,
-            drawtext=fontfile='../fonts/世界终结.otf'
+            drawtext=fontfile='{news_font}'
                 :text='{subtitle}'
                 :fontsize=90
                 :fontcolor=black@1
@@ -123,7 +124,7 @@ Tube:
                 :alpha='1'
                 :x=(w-tw)/2
                 :y=360,
-            drawtext=fontfile='../fonts/世界终结.otf'
+            drawtext=fontfile='{news_font}'
                 :text='{footer}'
                 :fontsize=60
                 :fontcolor=white@1
@@ -131,7 +132,7 @@ Tube:
                 :alpha='1'
                 :x=(w-tw)/2
                 :y=1720,
-            drawtext=fontfile='../fonts/世界终结.otf'
+            drawtext=fontfile='{news_font}'
                 :text='{date}'
                 :fontsize=50
                 :fontcolor=white@1

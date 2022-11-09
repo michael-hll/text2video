@@ -27,7 +27,7 @@ Pic2V:
     - run: CutPic --each i in ls
 
     # make video base on frames
-    - cmd: ffmpeg -y -r 25 -i tmp/img%03d.jpg -pix_fmt yuv420p -vcodec libx264 {output}
+    - cmd: ffmpeg -y -r 25 -i tmp/img%03d.jpg -pix_fmt yuv420p -vcodec libx264 {output} --key
     - f_del: tmp/img*.jpg
     - f_del: bg_hd.jpg
     
