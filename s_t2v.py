@@ -14,7 +14,7 @@ from s_utility import Utility
 import time
 import random
 
-article_file = './t_article.yaml'
+article_file = './d_article.yaml'
 if len(sys.argv) >= 2:
     article_file = sys.argv[1]
 
@@ -223,14 +223,13 @@ def get_init_video(article):
         driver.switch_to.parent_frame()
         print('Plase wait for generating the video...')
         # https://stackoverflow.com/questions/59130200/selenium-wait-until-element-is-present-visible-and-interactable
-        nologo_checkbox = WebDriverWait(driver, 180).until(
-            EC.presence_of_element_located((By.XPATH, "//input[contains(@class, 'ant-checkbox-input')]")))   
-        if nologo_checkbox.get_attribute('disabled') != 'true':     
-            nologo_checkbox.click()
-        time.sleep(5)
+        WebDriverWait(driver, 180).until(
+            EC.presence_of_element_located((By.XPATH, "//button[contains(@class, 'okButton___1POf1')]")))   
+        time.sleep(2)
         
         # 点击生成视频
-        div = driver.find_element(By.XPATH, "//div[contains(@class, 'ant-modal-footer')]")
+        # ant-btn ant-btn-round ant-btn-primary okButton___1POf1
+        div = driver.find_element(By.XPATH, "//button[contains(@class, 'okButton___1POf1')]")
         buttons = driver.find_elements(By.TAG_NAME, 'button')
         button = buttons[len(buttons) - 1]
         button.click()
