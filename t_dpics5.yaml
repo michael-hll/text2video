@@ -52,7 +52,8 @@ Tube:
                 :box=1:boxcolor=6B6B6B@0
                 :line_spacing=15
                 :x=(w-tw)/2
-                :y=(h-th)/2"
+                :y=(h-th)/2
+                :expansion=none"
             bg01_text1.jpg
     - cmd: ffplay bg01_text1.jpg --if {play}
     # pic with text to video OpenDoor1.mp4
@@ -77,7 +78,8 @@ Tube:
                 :box=1:boxcolor=#6B6B6B@0
                 :line_spacing=15
                 :x=(w-tw)/2
-                :y=(h-th)/2"
+                :y=(h-th)/2
+                :expansion=none"
             bg01_text2.jpg
     - cmd: ffplay bg01_text2.jpg --if no
     # pic with text to video OpenDoor2.mp4
