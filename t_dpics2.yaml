@@ -10,10 +10,10 @@ Variables:
     lines_count: 12
     p2v: yes
     delete: yes
+    bg: beidou.png
 Tube:
     # get dynamic video bg
     - cd: {dpics}
-    - set: background = beidou.png --if background == 'background'
     - run: Pic2V --if p2v
 
     # geneate news2.txt file
@@ -27,7 +27,7 @@ Tube:
     - set: font_size = 100 --if font_size > 100
     - set: news_file = news2.txt
     - run: WriteNewsToFile
-    - f_read: -f {news_file} -v lines
+    - f_read: -f {news_file} -l lines
     - f_del: news2.txt --if delete
 
     # write each news line into video
@@ -39,8 +39,8 @@ Tube:
     # write title
     - cmd: >
         ffmpeg -y -i {input} -vf 
-        "drawtext=fontsize=125:fontcolor=red:
-            fontfile='../fonts/未央简体.ttf':
+        "drawtext=fontsize=105:fontcolor=red:
+            fontfile='../fonts/世界终结.otf':
             text='{title}':
             borderw=5:bordercolor=white:
             box=1:boxcolor=#FFFE11@0.8:boxborderw=5:
@@ -55,7 +55,7 @@ WriteLine2V:
     - cmd: >
         ffmpeg -y -i {input} -vf 
         "drawtext=fontsize={font_size}:fontcolor={font_color}:
-            fontfile='../fonts/未央简体.ttf':
+            fontfile='../fonts/世界终结.otf':
             text='{line}':
             borderw=5:bordercolor=black:
             x=(w-text_w)/2:y={init_height}:
@@ -83,7 +83,7 @@ Pic2V:
     - set_var: dw = 1000        # delta width
     - set_var: tw = 1080 + dw   # temp width
     - cmd: >
-        ffmpeg -y -i {background} -filter:v 
+        ffmpeg -y -i {bg} -filter:v 
         "scale={tw}:1920:force_original_aspect_ratio=increase,crop={tw}:1920" 
         bg_whd.png
         --note 把下载的图片调成为 1080+dw:1920 像素
