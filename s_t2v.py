@@ -94,10 +94,10 @@ def get_init_video(article):
 
         # 数字人设置
         # 找到主要的div
-        button = driver.find_element(
-            By.XPATH, "//button[contains(@class, 'ant-btn vV3GeMC1CEtyWSju09LO0')]")
-        button.click()
-        time.sleep(3)
+        # button = driver.find_element(
+        #     By.XPATH, "//button[contains(@class, 'ant-btn vV3GeMC1CEtyWSju09LO0')]")
+        # button.click()
+        # time.sleep(3)
             
         # 随机选择一个数字播报员
         select_reporter_index = random.choice(suggest_reporters)   
