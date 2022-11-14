@@ -4,7 +4,7 @@ Variables:
     image: mask.jpg    
     out: out.mp4
     play: yes
-    vmargin: 100 # vertical margin
+    vmargin: 50 # vertical margin
 Tube:
     - cd: {dpics}
     - set: name_invalid = out.startswith('temp')
