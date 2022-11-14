@@ -120,6 +120,7 @@ Tube:
     - PATH: '{text2video_root}/tmp'
     - SET_VARIABLE: -n logo -v cnBeta.png --if media_type == cb
     - SET_VARIABLE: -n logo -v wallstreet.png --if media_type == ws
+    - SET: -n logo -v jiemian.png --if media_type == jm
     - COMMAND: >
         ffmpeg -y {video_duration} -i {output_final_prefix}tcw.mp4 -i {logo} -i Rnews.jpg
         -filter_complex "
