@@ -1,0 +1,22 @@
+Variables:
+    dpics: /volumes/macdrive/projects/text2video/dpics
+    speed: 150
+    image: mask.jpg    
+    out: out.mp4
+    play: yes
+Tube:
+    - cd: {dpics}
+    - cmd: ffmpeg -y -i {image} -vf "scale=1080:-1" temp.jpg
+    - cmd: ffprobe -v error -select_streams v:0 -show_format -show_entries stream -of default=nw=1 temp.jpg --result temp.jpg.log
+    - get_keys: -f temp.jpg.log -k height
+    - set: seconds = int((height - 1920) / speed)
+    - break: --if no
+    - cmd: ffmpeg -y -loop 1 -i temp.jpg -c:v libx264 -t {seconds} -pix_fmt yuv420p test_tmp.mp4
+    - cmd: ffmpeg -y -i test_tmp.mp4 -loop 1 -i temp.jpg -t {seconds} -filter_complex "
+        [1]scale=1080:-1[1v];
+        [0][1v]overlay=y=-{speed}*t,crop=1080:1920:0:-{speed}*t,scale=-1:1820,pad=1080:1920:-1:-1[out]"
+        -map "[out]" {out}
+    - f_del: temp.jpg
+    - f_del: temp.jpg.log
+    - f_del: test_tmp.mp4
+    - cmd: ffplay {out} --if play

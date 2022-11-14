@@ -21,6 +21,7 @@ all_pics.txt
 tmp.txt
 dpics/*.mp4
 dpics/*.png
+dpics/*.jpg
 dpics/news.yaml
 dpics/bg_green_new.jpg
 .vscode
