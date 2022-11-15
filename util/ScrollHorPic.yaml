@@ -32,4 +32,4 @@ Tube:
         -map "[out]" {out}
         --if direct == right
     - f_del: temp*
-    - cmd: open {out} --if play
+    - cmd: ffplay {out} --if play
