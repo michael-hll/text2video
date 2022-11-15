@@ -7,9 +7,8 @@ Variables:
     vmargin: 50 # vertical margin
 Tube:
     - cd: {dpics}
-    - set: name_invalid = out.startswith('temp')
-    - break: > 
-        'temp' is not allowed for the out file name: {out} --if name_invalid == yes
+    - break: >
+        'temp' is not allowed for the out file name: {out} --if out.startswith('temp')
     - cmd: ffmpeg -y -i {image} -vf "scale=1080:-1" temp.jpg
     - cmd: ffmpeg -y -i temp.jpg -vf "crop=1080:1920" temp_main.jpg
     - cmd: ffprobe -v error -select_streams v:0 -show_format -show_entries stream -of default=nw=1 temp.jpg --result temp.jpg.log
