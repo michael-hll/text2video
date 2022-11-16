@@ -137,7 +137,7 @@ Tube:
                 :borderw=0:bordercolor=#FF0000
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=1720,
+                :y=1570,
             drawtext=fontfile='{news_font}'
                 :text='{date}'
                 :fontsize=50
@@ -145,7 +145,7 @@ Tube:
                 :borderw=0:bordercolor=#FF0000
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=1800"
+                :y=1650"
         -c:a copy
         {output}   
     - cmd: ffplay {output} --if yes  
