@@ -20,5 +20,6 @@ Tube:
     - cmd: ffmpeg -y -i temp_test.mp4 -loop 1 -i temp.jpg -t {seconds} -filter_complex
         "[0][1]overlay=y=-{speed}*t,scale=-1:{new_height},pad=1080:1920:-1:-1[out]"
         -map "[out]" {out}
+        --key
     - f_del: temp*
     - cmd: ffplay {out} --if play
