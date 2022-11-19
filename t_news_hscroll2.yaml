@@ -1,0 +1,101 @@
+# 图片横向滚动，并在上面添加标题，动态新闻内容
+# >>> 
+Variables:
+    dpics: /volumes/macdrive/projects/text2video/dpics  
+    pic: shanghai.png
+    speed: 100
+    out: out.mp4
+    play: yes
+    vmargin: 0
+    direct: left
+    font_name: fonts/未央简体.ttf
+    font_size: 60
+    line_size: 15
+    p2v: yes
+    test: no
+Tube:
+    - run: util/ScrollHorPic.yaml -v 
+            speed={speed},
+            image={pic},
+            out={out},
+            play={play},
+            vmargin={vmargin},
+            direct={direct}
+            --if {p2v}
+    - get_keys: -f dpics/news.yaml
+    - run: util/WriteCont2TXT.yaml -v 
+            content={content},
+            line_size={line_size}
+    - f_read: -f dpics/output.txt -l lines
+    - f_cp: -f dpics/{out} -t dpics/temp.mp4    
+    - run: WrLineToV --each line in lines -v font_y = 500, start = 0.0, end = 100
+
+    # Add title, subtitle
+    - cmd: >
+        ffmpeg -y -i dpics/temp.mp4 -filter_complex "
+            drawbox=x=0:y=350:color=#FFD700@1:
+                width=1080:height=90:t=fill,
+            drawtext=fontfile='{font_name}'
+                :text='{title}'
+                :fontsize=100
+                :fontcolor=white@1
+                :borderw=4:bordercolor=#FF0000
+                :alpha='1'
+                :x=(w-tw)/2
+                :y=250,
+            drawtext=fontfile='{font_name}'
+                :text='{subtitle}'
+                :fontsize=75
+                :fontcolor=black@1
+                :borderw=0:bordercolor=#FFFFFF
+                :alpha='1'
+                :x=(w-tw)/2
+                :y=360,
+            drawtext=fontfile='{font_name}'
+                :text='{footer}'
+                :fontsize=60
+                :fontcolor=white@1
+                :borderw=0:bordercolor=#FF0000
+                :alpha='1'
+                :x=(w-tw)/2
+                :y=1600,
+            drawtext=fontfile='{font_name}'
+                :text='{date}'
+                :fontsize=50
+                :fontcolor=white@1
+                :borderw=0:bordercolor=#FF0000
+                :alpha='1'
+                :x=(w-tw)/2
+                :y=1680"
+        -c:a copy
+        dpics/temp2.mp4
+    
+    - f_cp: -f dpics/temp2.mp4 -t dpics/{out} --if test == no
+    - f_del: dpics/temp*.mp4 --if test == no
+    - f_del: dpics/output.txt --if test == no
+    - cmd: ffplay dpics/{out} --if test == no
+    - cmd: ffplay dpics/temp2.mp4 --if test == yes
+
+WrLineToV:
+    - print: {line}
+    - set: font_y += font_size + 10    
+    - set: >
+        -n alpha
+        -v if(lt(t,{start}),0,
+                if(lt(t,{start}+1.5),(t-{start})/1.5, 1))
+    - cmd: >
+        ffmpeg -y -i dpics/temp.mp4 -vf 
+            "drawtext=fontfile='{font_name}'
+            :text='{line}'
+            :fontcolor=white
+            :fontsize={font_size}
+            :borderw=2
+            :bordercolor=black
+            :x=(w-tw)/2
+            :y={font_y}
+            :enable='between(t,{start},{end})'
+            :alpha='{alpha}'
+            :expansion=none" 
+            dpics/temp2.mp4
+    - set: start += 0.5 -g
+    - f_cp: -f dpics/temp2.mp4 -t dpics/temp.mp4
