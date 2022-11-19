@@ -57,7 +57,7 @@ Tube:
                 :borderw=0:bordercolor=#FF0000
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=1570,
+                :y=1600,
             drawtext=fontfile='{font_name}'
                 :text='{date}'
                 :fontsize=50
@@ -65,7 +65,7 @@ Tube:
                 :borderw=0:bordercolor=#FF0000
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=1650"
+                :y=1680"
         -c:a copy
         dpics/temp2.mp4
     
