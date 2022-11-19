@@ -1,5 +1,5 @@
 # 图片横向滚动，并在上面添加标题，动态新闻内容
-# >>> 
+# >>> tube t_news_hscroll2 -fdc -v play=no, p2v=yes, pic=北京01.png, test=no
 Variables:
     dpics: /volumes/macdrive/projects/text2video/dpics  
     pic: shanghai.png
