@@ -33,7 +33,7 @@ Tube:
     - cmd: >
         ffmpeg -y -i dpics/temp.mp4 -filter_complex "
             drawbox=x=0:y=350:color=#FFD700@1:
-                width=1080:height=100:t=fill,
+                width=1080:height=90:t=fill,
             drawtext=fontfile='{font_name}'
                 :text='{title}'
                 :fontsize=100
@@ -44,7 +44,7 @@ Tube:
                 :y=250,
             drawtext=fontfile='{font_name}'
                 :text='{subtitle}'
-                :fontsize=90
+                :fontsize=75
                 :fontcolor=black@1
                 :borderw=0:bordercolor=#FFFFFF
                 :alpha='1'
@@ -69,7 +69,10 @@ Tube:
         -c:a copy
         dpics/temp2.mp4
     
-    - cmd: ffplay dpics/temp2.mp4
+    - f_cp: -f dpics/temp2.mp4 -t dpics/{out}
+    - f_del: dpics/temp*.mp4
+    - f_del: dpics/output.txt
+    - cmd: ffplay dpics/{out}
 
 WrLineToV:
     - print: {line}
