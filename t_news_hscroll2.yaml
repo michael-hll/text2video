@@ -42,7 +42,8 @@ Tube:
                 :borderw=4:bordercolor=#FF0000
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=250,
+                :y=250
+                :expansion=none,
             drawtext=fontfile='{font_name}'
                 :text='{subtitle}'
                 :fontsize=75
@@ -50,7 +51,8 @@ Tube:
                 :borderw=0:bordercolor=#FFFFFF
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=360,
+                :y=360
+                :expansion=none,
             drawtext=fontfile='{font_name}'
                 :text='{footer}'
                 :fontsize=60
@@ -58,7 +60,8 @@ Tube:
                 :borderw=0:bordercolor=#FF0000
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=1600,
+                :y=1550
+                :expansion=none,
             drawtext=fontfile='{font_name}'
                 :text='{date}'
                 :fontsize=50
@@ -66,7 +69,8 @@ Tube:
                 :borderw=0:bordercolor=#FF0000
                 :alpha='1'
                 :x=(w-tw)/2
-                :y=1680"
+                :y=1630
+                :expansion=none"
         -c:a copy
         dpics/temp2.mp4
     
