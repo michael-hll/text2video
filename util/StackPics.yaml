@@ -1,0 +1,27 @@
+Variables:
+    dpics: /volumes/macdrive/projects/text2video/dpics 
+    name: qmsht*h.jpg   
+    output: qmsht_full.png
+    stack_type: hstack
+Tube:
+    - cd: {dpics}
+    - list_f: -f {name} -s name desc -v pics
+    - set: inputs = ''
+    - set: stack_list = ''
+    - set: count = 0
+    - run: PrepareInputs --each pic in pics
+    - print: >
+        {inputs} , {stack_list}, {count} 
+        --raw-log
+    - break: return --if count == 0
+    - cmd: >
+        ffmpeg -y {inputs} -filter_complex "
+            {stack_list}{stack_type}=inputs={count}[v]"
+        -map "[v]" {output}
+
+PrepareInputs:
+    - print: {pic}
+    - set: inputs += '-i ' + pic + ' ' -g
+    - set: stack_list += '[' + str(count) + ':v]' -g
+    - set: count += 1 -g
+   
