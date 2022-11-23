@@ -1,0 +1,13 @@
+Variables:
+    dpics: /volumes/macdrive/projects/text2video/dpics 
+    name: qmsht*.jpg   
+    height: 1920
+Tube:
+    - cd: {dpics}
+    - list_f: -f {name} -s name asc -v pics
+    - run: ChangeSize --each pic in pics
+
+ChangeSize:
+    - print: {pic}
+    - set: new = pic[:pic.index('.')] + 'h.jpg'
+    - cmd: ffmpeg -y -i {pic} -vf scale=-1:{height} {new}
