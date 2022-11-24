@@ -1,0 +1,21 @@
+Variables:
+    dpics: /volumes/macdrive/projects/text2video/dpics 
+    name: qmsht*.jpg   
+    height: 1920
+    # 2k: 1920:1080
+    # 4k: 3840:2160
+Tube:
+    - cd: {dpics}
+    - list_f: -f {name} -s name asc -v pics
+    - run: ChangeSize --each pic in pics
+
+ChangeSize:
+    - print: {pic}
+    - set: new = pic[:pic.index('.')] + 'h.jpg'
+    - cmd: identify -format '%w:%h' {pic} --result temp_img_size.log
+    - read_ln: -f temp_img_size.log -n 1 -v img_size
+    - f_del: temp_img_size.log
+    - set: w = int(img_size[:img_size.index(':')])
+    - set: h = int(img_size[img_size.index(':')+1:])
+    - set: width = int((height * w)/h)
+    - cmd: convert {pic} -resize {width}x{height} -quality 100 {new}
