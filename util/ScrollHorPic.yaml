@@ -14,7 +14,7 @@ Tube:
     - cd: {dpics}
     - break: >
         'temp' is not allowed for the begining of out file name: {out} --if out.startswith('temp')
-    - cmd: ffmpeg -y -i {image} -vf "scale=-1:{scaleH}" temp.png    
+    - cmd: ffmpeg -y -i '{image}' -vf "scale=-1:{scaleH}" temp.png    
     - cmd: ffprobe -v error -select_streams v:0 -show_format -show_entries stream -of default=nw=1 temp.png --result temp.png.log
     - get_keys: -f temp.png.log -k width, height
     # gen left main page
