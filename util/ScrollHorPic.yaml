@@ -6,29 +6,33 @@ Variables:
     play: yes
     vmargin: 50 # vertical margin
     direct: left
+    scaleW: 1080
+    scaleH: 1920
+    # 4k: 3840:2160
+    # 2k: 1920:1080
 Tube:
     - cd: {dpics}
     - break: >
         'temp' is not allowed for the begining of out file name: {out} --if out.startswith('temp')
-    - cmd: ffmpeg -y -i {image} -vf "scale=-1:1920" temp.png    
+    - cmd: ffmpeg -y -i {image} -vf "scale=-1:{scaleH}" temp.png    
     - cmd: ffprobe -v error -select_streams v:0 -show_format -show_entries stream -of default=nw=1 temp.png --result temp.png.log
     - get_keys: -f temp.png.log -k width, height
     # gen left main page
-    - cmd: ffmpeg -y -i temp.png -vf "crop=1080:1920:0:0" temp_main.png --if direct == left
+    - cmd: ffmpeg -y -i temp.png -vf "crop={scaleW}:{scaleH}:0:0" temp_main.png --if direct == left
     # gen right main page
-    - cmd: ffmpeg -y -i temp.png -vf "crop=1080:1920:{width}-1080:0" temp_main.png --if direct == right
-    - set: seconds = int((width - 1080) / speed)
+    - cmd: ffmpeg -y -i temp.png -vf "crop={scaleW}:{scaleH}:{width}-{scaleW}:0" temp_main.png --if direct == right
+    - set: seconds = int((width - {scaleW}) / speed)
     - break: --if no
     - cmd: ffmpeg -y -loop 1 -i temp_main.png -c:v libx264 -t {seconds} -pix_fmt yuv420p temp_test.mp4
-    - set: new_height = 1920 - 2 * vmargin
+    - set: new_height = {scaleH} - 2 * vmargin
     # gen left -> right video
     - cmd: ffmpeg -y -i temp_test.mp4 -loop 1 -i temp.png -t {seconds} -filter_complex
-        "[0][1]overlay=x=-{speed}*t,scale=-1:{new_height},pad=1080:1920:-1:-1[out]"
+        "[0][1]overlay=x=-{speed}*t,scale=-1:{new_height},pad={scaleW}:{scaleH}:-1:-1[out]"
         -map "[out]" {out}
         --if direct == left
     # gen right -> left video
     - cmd: ffmpeg -y -i temp_test.mp4 -loop 1 -i temp.png -t {seconds} -filter_complex
-        "[0][1]overlay=x={speed}*t-({width}-1080),scale=-1:{new_height},pad=1080:1920:-1:-1[out]"
+        "[0][1]overlay=x={speed}*t-({width}-{scaleW}),scale=-1:{new_height},pad={scaleW}:{scaleH}:-1:-1[out]"
         -map "[out]" {out}
         --if direct == right
     - f_del: temp*
