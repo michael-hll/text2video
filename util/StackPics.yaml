@@ -5,7 +5,7 @@ Variables:
     stack_type: hstack
 Tube:
     - cd: {dpics}
-    - list_f: -f {name} -s name desc -v pics
+    - list_f: -f '{name}' -s name desc -v pics
     - set: inputs = ''
     - set: stack_list = ''
     - set: count = 0
@@ -17,11 +17,11 @@ Tube:
     - cmd: >
         ffmpeg -y {inputs} -filter_complex "
             {stack_list}{stack_type}=inputs={count}[v]"
-        -map "[v]" {output}
+        -map "[v]" '{output}'
 
 PrepareInputs:
     - print: {pic}
-    - set: inputs += '-i ' + pic + ' ' -g
+    - set: inputs += '-i "' + pic + '" ' -g
     - set: stack_list += '[' + str(count) + ':v]' -g
     - set: count += 1 -g
    
