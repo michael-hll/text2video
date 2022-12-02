@@ -57,7 +57,7 @@ Tube:
                 :text='{footer}'
                 :fontsize=60
                 :fontcolor=white@1
-                :borderw=0:bordercolor=#FF0000
+                :borderw=2:bordercolor=black
                 :alpha='1'
                 :x=(w-tw)/2
                 :y=1550
@@ -66,7 +66,7 @@ Tube:
                 :text='{date}'
                 :fontsize=50
                 :fontcolor=white@1
-                :borderw=0:bordercolor=#FF0000
+                :borderw=2:bordercolor=black
                 :alpha='1'
                 :x=(w-tw)/2
                 :y=1630
